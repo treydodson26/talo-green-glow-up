@@ -211,13 +211,32 @@ const ClientsTable = () => {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
-              <DropdownMenuItem>Export</DropdownMenuItem>
-              <DropdownMenuItem>Import</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => {
+                toast({
+                  title: "Export Data",
+                  description: "Export functionality will be implemented soon.",
+                });
+              }}>
+                Export
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => {
+                toast({
+                  title: "Import Data",
+                  description: "Import functionality will be implemented soon.",
+                });
+              }}>
+                Import
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
           <Button 
             className="bg-primary hover:bg-primary/90 gap-2"
-            onClick={() => console.log("Add new client clicked")}
+            onClick={() => {
+              toast({
+                title: "Add New Client",
+                description: "Client creation dialog will be implemented soon.",
+              });
+            }}
           >
             <Plus className="h-4 w-4" />
             Add new
@@ -254,7 +273,16 @@ const ClientsTable = () => {
             className="pl-10"
           />
         </div>
-        <Button variant="outline" size="icon">
+        <Button 
+          variant="outline" 
+          size="icon"
+          onClick={() => {
+            toast({
+              title: "Filter Options",
+              description: "Advanced filter options will be implemented soon.",
+            });
+          }}
+        >
           <Filter className="h-4 w-4" />
         </Button>
       </div>
@@ -366,11 +394,25 @@ const ClientsTable = () => {
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">
                         {customer.phone_number && (
-                          <Button variant="ghost" size="icon" title="Call customer">
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            title="Call customer"
+                            onClick={() => {
+                              window.open(`tel:${customer.phone_number}`, '_self');
+                            }}
+                          >
                             <Phone className="h-4 w-4" />
                           </Button>
                         )}
-                        <Button variant="ghost" size="icon" title="Email customer">
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          title="Email customer"
+                          onClick={() => {
+                            window.open(`mailto:${customer.client_email}`, '_self');
+                          }}
+                        >
                           <Mail className="h-4 w-4" />
                         </Button>
                         <DropdownMenu>
@@ -380,9 +422,31 @@ const ClientsTable = () => {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
-                            <DropdownMenuItem>View Details</DropdownMenuItem>
-                            <DropdownMenuItem>Edit</DropdownMenuItem>
-                            <DropdownMenuItem>Delete</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => {
+                              toast({
+                                title: "Customer Details",
+                                description: `Viewing details for ${customer.first_name} ${customer.last_name}`,
+                              });
+                            }}>
+                              View Details
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => {
+                              toast({
+                                title: "Edit Customer",
+                                description: `Edit functionality for ${customer.first_name} ${customer.last_name} will be implemented soon.`,
+                              });
+                            }}>
+                              Edit
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => {
+                              toast({
+                                title: "Delete Customer",
+                                description: `Delete functionality will be implemented soon.`,
+                                variant: "destructive",
+                              });
+                            }}>
+                              Delete
+                            </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </div>

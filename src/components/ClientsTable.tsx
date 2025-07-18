@@ -53,17 +53,51 @@ const ClientsTable = () => {
     "First class booked"
   ];
 
-  // Load customers from Supabase
+  // Load customers from Supabase based on active filter
   const loadCustomers = async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase
-        .from('customers')
-        .select('*')
-        .order('created_at', { ascending: false });
+      
+      let query;
+      
+      if (activeFilter === "Intro Offer") {
+        // Get customers from intro_offer_customers table
+        query = supabase
+          .from('intro_offer_customers')
+          .select('*')
+          .order('created_at', { ascending: false });
+      } else {
+        // Get all customers from main customers table
+        query = supabase
+          .from('customers')
+          .select('*')
+          .order('created_at', { ascending: false });
+      }
+
+      const { data, error } = await query;
 
       if (error) throw error;
-      setCustomers(data || []);
+      
+      // Transform intro_offer_customers data to match customer interface if needed
+      if (activeFilter === "Intro Offer" && data) {
+        const transformedData = data.map((customer: any) => ({
+          id: customer.id,
+          first_name: customer.first_name,
+          last_name: customer.last_name,
+          client_email: customer.client_email,
+          phone_number: customer.phone_number,
+          tags: customer.tags,
+          created_at: customer.created_at || customer.intro_start_date,
+          first_seen: customer.first_seen,
+          last_seen: customer.last_seen,
+          marketing_email_opt_in: customer.marketing_email_opt_in,
+          marketing_text_opt_in: customer.marketing_text_opt_in,
+          transactional_text_opt_in: customer.transactional_text_opt_in,
+        }));
+        setCustomers(transformedData);
+      } else {
+        setCustomers(data || []);
+      }
     } catch (error: any) {
       console.error('Error loading customers:', error);
       toast({
@@ -76,7 +110,7 @@ const ClientsTable = () => {
     }
   };
 
-  // Set up real-time subscription
+  // Set up real-time subscription and reload when filter changes
   useEffect(() => {
     loadCustomers();
 
@@ -93,26 +127,29 @@ const ClientsTable = () => {
         (payload) => {
           console.log('Real-time customer change:', payload);
           
-          if (payload.eventType === 'INSERT') {
-            setCustomers(prev => [payload.new as Customer, ...prev]);
-            toast({
-              title: "New customer added",
-              description: `${payload.new.first_name} ${payload.new.last_name} has been added.`,
-            });
-          } else if (payload.eventType === 'UPDATE') {
-            setCustomers(prev => 
-              prev.map(customer => 
-                customer.id === payload.new.id ? payload.new as Customer : customer
-              )
-            );
-          } else if (payload.eventType === 'DELETE') {
-            setCustomers(prev => 
-              prev.filter(customer => customer.id !== payload.old.id)
-            );
-            toast({
-              title: "Customer removed",
-              description: "A customer has been deleted.",
-            });
+          // Only update if we're currently viewing "All" customers
+          if (activeFilter === "All") {
+            if (payload.eventType === 'INSERT') {
+              setCustomers(prev => [payload.new as Customer, ...prev]);
+              toast({
+                title: "New customer added",
+                description: `${payload.new.first_name} ${payload.new.last_name} has been added.`,
+              });
+            } else if (payload.eventType === 'UPDATE') {
+              setCustomers(prev => 
+                prev.map(customer => 
+                  customer.id === payload.new.id ? payload.new as Customer : customer
+                )
+              );
+            } else if (payload.eventType === 'DELETE') {
+              setCustomers(prev => 
+                prev.filter(customer => customer.id !== payload.old.id)
+              );
+              toast({
+                title: "Customer removed",
+                description: "A customer has been deleted.",
+              });
+            }
           }
         }
       )
@@ -121,7 +158,7 @@ const ClientsTable = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [toast]);
+  }, [activeFilter, toast]); // Reload when activeFilter changes
 
   // Format date for display
   const formatDate = (dateString: string) => {

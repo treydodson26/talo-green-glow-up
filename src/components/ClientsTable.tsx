@@ -61,11 +61,13 @@ const ClientsTable = () => {
       let query;
       
       if (activeFilter === "Intro Offer") {
-        // Get customers from intro_offer_customers table
+        // Get only active intro offer customers (new status, most recent 10)
         query = supabase
           .from('intro_offer_customers')
           .select('*')
-          .order('created_at', { ascending: false });
+          .eq('intro_status', 'new')
+          .order('intro_start_date', { ascending: false })
+          .limit(10);
       } else {
         // Get all customers from main customers table
         query = supabase

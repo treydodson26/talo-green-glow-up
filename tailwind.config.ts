@@ -61,7 +61,21 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				'talo-green': {
+					DEFAULT: 'hsl(var(--talo-green))',
+					light: 'hsl(var(--talo-green-light))',
+					dark: 'hsl(var(--talo-green-dark))',
+					accent: 'hsl(var(--talo-green-accent))'
 				}
+			},
+			backgroundImage: {
+				'gradient-green': 'var(--gradient-green)',
+				'gradient-subtle': 'var(--gradient-subtle)'
+			},
+			boxShadow: {
+				'green': 'var(--shadow-green)',
+				'soft': 'var(--shadow-soft)'
 			},
 			borderRadius: {
 				lg: 'var(--radius)',

@@ -241,16 +241,17 @@ When to Arrive: Please arrive at least 5 minutes before your class for a soft la
           <Button 
             onClick={sendWhatsAppMessage}
             disabled={isLoading || !selectedCustomer || !messageContent.trim() || !canReceiveTexts(selectedCustomer || {} as Customer)}
-            className="w-full"
+            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
+            size="lg"
           >
             {isLoading ? (
               <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Sending...
+                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                Sending WhatsApp...
               </>
             ) : (
               <>
-                <Send className="mr-2 h-4 w-4" />
+                <Send className="mr-2 h-5 w-5" />
                 Send WhatsApp Message
               </>
             )}

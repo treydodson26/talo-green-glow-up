@@ -106,8 +106,12 @@ When to Arrive: Please arrive at least 5 minutes before your class for a soft la
     }
 
     setIsLoading(true);
+    console.log('Attempting to send WhatsApp message to:', selectedCustomer);
+    console.log('Message content:', messageContent);
 
     try {
+      console.log('Calling supabase edge function: send-whatsapp-message');
+      
       const { data, error } = await supabase.functions.invoke('send-whatsapp-message', {
         body: {
           customer_id: selectedCustomer.id,
@@ -117,9 +121,15 @@ When to Arrive: Please arrive at least 5 minutes before your class for a soft la
         }
       });
 
-      if (error) throw error;
+      console.log('Edge function response:', { data, error });
 
-      if (data.success) {
+      if (error) {
+        console.error('Supabase function error:', error);
+        throw error;
+      }
+
+      if (data && data.success) {
+        console.log('Message sent successfully:', data);
         toast({
           title: "Success!",
           description: `WhatsApp message sent to ${selectedCustomer.first_name} ${selectedCustomer.last_name}`,
@@ -131,7 +141,8 @@ When to Arrive: Please arrive at least 5 minutes before your class for a soft la
         // Reload communication logs
         loadCommunicationLogs();
       } else {
-        throw new Error(data.error || 'Unknown error occurred');
+        console.error('Function returned failure:', data);
+        throw new Error(data?.error || 'Unknown error occurred');
       }
     } catch (error: any) {
       console.error('WhatsApp send error:', error);

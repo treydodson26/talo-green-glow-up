@@ -40,6 +40,8 @@ const ClientsTable = () => {
   const [activeFilter, setActiveFilter] = useState("All");
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(true);
+  const [totalIntroOfferCount, setTotalIntroOfferCount] = useState(0);
+  const [showAllIntroOffers, setShowAllIntroOffers] = useState(false);
   const { toast } = useToast();
 
   const filters = [
@@ -58,49 +60,47 @@ const ClientsTable = () => {
     try {
       setLoading(true);
       
-      let query;
-      
       if (activeFilter === "Intro Offer") {
-        // Get intro offer customers from the last 30 days
+        // Calculate 30 days ago from today
         const thirtyDaysAgo = new Date();
         thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
         
-        query = supabase
-          .from('intro_offer_customers')
+        // First, get the total count of customers in intro offer period
+        const { count: totalCount, error: countError } = await supabase
+          .from('customers')
+          .select('*', { count: 'exact', head: true })
+          .gte('first_seen', thirtyDaysAgo.toISOString())
+          .not('first_seen', 'is', null);
+
+        if (countError) throw countError;
+        setTotalIntroOfferCount(totalCount || 0);
+
+        // Then get the actual data
+        const limit = showAllIntroOffers ? undefined : 10;
+        let query = supabase
+          .from('customers')
           .select('*')
-          .gte('intro_start_date', thirtyDaysAgo.toISOString())
-          .order('intro_start_date', { ascending: false });
+          .gte('first_seen', thirtyDaysAgo.toISOString())
+          .not('first_seen', 'is', null)
+          .order('first_seen', { ascending: false });
+        
+        if (limit) {
+          query = query.limit(limit);
+        }
+
+        const { data, error } = await query;
+        if (error) throw error;
+        setCustomers(data || []);
       } else {
         // Get all customers from main customers table
-        query = supabase
+        const { data, error } = await supabase
           .from('customers')
           .select('*')
           .order('created_at', { ascending: false });
-      }
 
-      const { data, error } = await query;
-
-      if (error) throw error;
-      
-      // Transform intro_offer_customers data to match customer interface if needed
-      if (activeFilter === "Intro Offer" && data) {
-        const transformedData = data.map((customer: any) => ({
-          id: customer.id,
-          first_name: customer.first_name,
-          last_name: customer.last_name,
-          client_email: customer.client_email,
-          phone_number: customer.phone_number,
-          tags: customer.tags,
-          created_at: customer.created_at || customer.intro_start_date,
-          first_seen: customer.first_seen,
-          last_seen: customer.last_seen,
-          marketing_email_opt_in: customer.marketing_email_opt_in,
-          marketing_text_opt_in: customer.marketing_text_opt_in,
-          transactional_text_opt_in: customer.transactional_text_opt_in,
-        }));
-        setCustomers(transformedData);
-      } else {
+        if (error) throw error;
         setCustomers(data || []);
+        setTotalIntroOfferCount(0); // Reset intro offer count for other filters
       }
     } catch (error: any) {
       console.error('Error loading customers:', error);
@@ -162,7 +162,7 @@ const ClientsTable = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [activeFilter, toast]); // Reload when activeFilter changes
+  }, [activeFilter, showAllIntroOffers, toast]); // Reload when activeFilter or showAllIntroOffers changes
 
   // Format date for display
   const formatDate = (dateString: string) => {
@@ -249,6 +249,38 @@ const ClientsTable = () => {
           <Filter className="h-4 w-4" />
         </Button>
       </div>
+
+      {/* Intro Offer Summary - Only show when viewing Intro Offer filter */}
+      {activeFilter === "Intro Offer" && totalIntroOfferCount > 0 && !loading && (
+        <div className="bg-muted/50 rounded-lg p-4 mb-6 border">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="font-semibold text-foreground">Intro Offer Period Customers</h3>
+              <p className="text-muted-foreground mt-1">
+                Showing {showAllIntroOffers ? filteredCustomers.length : Math.min(10, filteredCustomers.length)} of {totalIntroOfferCount} customers 
+                who started their intro offer within the last 30 days
+              </p>
+            </div>
+            {totalIntroOfferCount > 10 && (
+              <Button
+                variant={showAllIntroOffers ? "secondary" : "outline"}
+                onClick={() => setShowAllIntroOffers(!showAllIntroOffers)}
+                className="ml-4"
+              >
+                {showAllIntroOffers ? `Show Recent 10` : `View All ${totalIntroOfferCount}`}
+              </Button>
+            )}
+          </div>
+          {totalIntroOfferCount > 10 && !showAllIntroOffers && (
+            <div className="mt-3 text-sm text-muted-foreground">
+              <Badge variant="outline" className="mr-2">
+                {totalIntroOfferCount - 10} more customers available
+              </Badge>
+              Click "View All" to see the complete list
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Loading State */}
       {loading && (

@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { X } from "lucide-react";
+import { X, MessageSquare } from "lucide-react";
+import WhatsAppMessaging from "./WhatsAppMessaging";
 
 const HomePage = () => {
   return (
@@ -31,7 +32,7 @@ const HomePage = () => {
       </Card>
 
       {/* Push Notifications Card */}
-      <Card className="shadow-soft border-talo-green-light">
+      <Card className="mb-6 shadow-soft border-talo-green-light">
         <CardHeader className="pb-4">
           <div className="flex justify-between items-start">
             <div className="flex-1">
@@ -70,6 +71,15 @@ const HomePage = () => {
           </div>
         </CardContent>
       </Card>
+
+      {/* WhatsApp Messaging Section */}
+      <div className="mb-6">
+        <div className="flex items-center gap-2 mb-4">
+          <MessageSquare className="h-6 w-6 text-talo-green" />
+          <h2 className="text-xl font-semibold text-foreground">WhatsApp Demo</h2>
+        </div>
+        <WhatsAppMessaging />
+      </div>
     </div>
   );
 };

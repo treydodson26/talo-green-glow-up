@@ -61,13 +61,15 @@ const ClientsTable = () => {
       let query;
       
       if (activeFilter === "Intro Offer") {
-        // Get only active intro offer customers (new status, most recent 10)
+        // Get intro offer customers from the last 30 days
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+        
         query = supabase
           .from('intro_offer_customers')
           .select('*')
-          .eq('intro_status', 'new')
-          .order('intro_start_date', { ascending: false })
-          .limit(10);
+          .gte('intro_start_date', thirtyDaysAgo.toISOString())
+          .order('intro_start_date', { ascending: false });
       } else {
         // Get all customers from main customers table
         query = supabase

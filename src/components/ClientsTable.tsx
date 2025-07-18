@@ -166,7 +166,10 @@ const ClientsTable = () => {
               <DropdownMenuItem>Import</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <Button className="bg-primary hover:bg-primary/90 gap-2">
+          <Button 
+            className="bg-primary hover:bg-primary/90 gap-2"
+            onClick={() => console.log("Add new client clicked")}
+          >
             <Plus className="h-4 w-4" />
             Add new
           </Button>

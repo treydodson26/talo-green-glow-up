@@ -40,6 +40,7 @@ const ClientsTable = () => {
   const [activeFilter, setActiveFilter] = useState("All");
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(true);
+  const [totalCustomerCount, setTotalCustomerCount] = useState(0);
   const [totalIntroOfferCount, setTotalIntroOfferCount] = useState(0);
   const [showAllIntroOffers, setShowAllIntroOffers] = useState(false);
   const { toast } = useToast();
@@ -92,6 +93,14 @@ const ClientsTable = () => {
         if (error) throw error;
         setCustomers(data || []);
       } else {
+        // Get total count of all customers
+        const { count: totalCount, error: countError } = await supabase
+          .from('customers')
+          .select('*', { count: 'exact', head: true });
+
+        if (countError) throw countError;
+        setTotalCustomerCount(totalCount || 0);
+
         // Get all customers from main customers table
         const { data, error } = await supabase
           .from('customers')
@@ -282,6 +291,23 @@ const ClientsTable = () => {
         </div>
       )}
 
+      {/* All Customers Summary - Only show when viewing All filter */}
+      {activeFilter === "All" && totalCustomerCount > 0 && !loading && (
+        <div className="bg-muted/50 rounded-lg p-4 mb-6 border">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="font-semibold text-foreground">All Customers</h3>
+              <p className="text-muted-foreground mt-1">
+                Total of {totalCustomerCount} customers in the database
+                {searchTerm && ` (showing ${filteredCustomers.length} matching "${searchTerm}")`}
+              </p>
+            </div>
+            <Badge variant="secondary" className="text-lg px-3 py-1">
+              {totalCustomerCount.toLocaleString()}
+            </Badge>
+          </div>
+        </div>
+      )}
       {/* Loading State */}
       {loading && (
         <div className="flex justify-center items-center py-8">

@@ -157,7 +157,15 @@ When to Arrive: Please arrive at least 5 minutes before your class for a soft la
   };
 
   const canReceiveTexts = (customer: Customer) => {
-    return customer.marketing_text_opt_in || customer.transactional_text_opt_in;
+    // If both are explicitly false, they can't receive texts
+    if (customer.marketing_text_opt_in === false && customer.transactional_text_opt_in === false) {
+      return false;
+    }
+    // If either is true or null (default allowed), they can receive texts
+    return customer.marketing_text_opt_in === true || 
+           customer.transactional_text_opt_in === true || 
+           customer.marketing_text_opt_in === null || 
+           customer.transactional_text_opt_in === null;
   };
 
   const getStatusIcon = (status: string) => {

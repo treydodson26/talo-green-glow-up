@@ -19,6 +19,7 @@ import {
 import { Search, Filter, MoreHorizontal, Plus, ChevronDown, Phone, Mail, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import IntroOffersSections from "@/components/IntroOffersSections";
 
 interface Customer {
   id: number;
@@ -344,8 +345,13 @@ const ClientsTable = () => {
         </div>
       )}
 
-      {/* Table */}
-      {!loading && (
+      {/* Intro Offers Sections - Show when Intro Offer filter is active */}
+      {!loading && activeFilter === "Intro Offer" && (
+        <IntroOffersSections />
+      )}
+
+      {/* Table - Show for all other filters */}
+      {!loading && activeFilter !== "Intro Offer" && (
         <div className="bg-card rounded-lg border shadow-soft">
           <Table>
             <TableHeader>

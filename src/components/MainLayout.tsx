@@ -5,6 +5,7 @@ import ClientsTable from "@/components/ClientsTable";
 import HomePage from "@/components/HomePage";
 import InboxPage from "@/components/InboxPage";
 import InstructorHub from "@/components/InstructorHub";
+import OperationsHub from "@/components/OperationsHub";
 
 const MainLayout = () => {
   const [activeRoute, setActiveRoute] = useState("clients");
@@ -15,6 +16,8 @@ const MainLayout = () => {
         return <HomePage />;
       case "instructor-hub":
         return <InstructorHub />;
+      case "operations-hub":
+        return <OperationsHub />;
       case "inbox":
         return <InboxPage />;
       case "clients":

@@ -21,10 +21,10 @@ interface SidebarProps {
 const Sidebar = ({ activeRoute = "home", onRouteChange }: SidebarProps) => {
   const navItems = [
     { id: "home", icon: Home, label: "Home" },
+    { id: "inbox", icon: Inbox, label: "Inbox" },
     { id: "instructor-hub", icon: GraduationCap, label: "Instructor Hub" },
     { id: "operations-hub", icon: Cog, label: "Operations Hub" },
     { id: "marketing-hub", icon: Megaphone, label: "Marketing Hub" },
-    { id: "inbox", icon: Inbox, label: "Inbox" },
     { id: "customers", icon: UserPlus, label: "Customers" },
     { id: "segments", icon: BarChart3, label: "Segments" },
     { id: "comments", icon: MessageSquare, label: "Comments" },

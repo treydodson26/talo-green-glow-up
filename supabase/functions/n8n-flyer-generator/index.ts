@@ -25,11 +25,14 @@ serve(async (req) => {
     
     console.log('Using webhook URL:', N8N_WEBHOOK_URL);
 
-    // Call n8n webhook
+    // Call n8n webhook with detailed logging
+    console.log('Sending payload:', JSON.stringify({ prompt, title }, null, 2));
+    
     const response = await fetch(N8N_WEBHOOK_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'User-Agent': 'Supabase-Edge-Function/1.0'
       },
       body: JSON.stringify({
         prompt: prompt,
@@ -37,14 +40,18 @@ serve(async (req) => {
       }),
     });
 
+    console.log('Response status:', response.status);
+    console.log('Response headers:', JSON.stringify(Object.fromEntries(response.headers.entries())));
+    
     if (!response.ok) {
-      console.error('n8n webhook error:', response.status, response.statusText);
-      throw new Error(`n8n webhook failed: ${response.status} ${response.statusText}`);
+      const errorText = await response.text();
+      console.error('n8n webhook error response:', errorText);
+      throw new Error(`n8n webhook failed: ${response.status} ${response.statusText} - ${errorText}`);
     }
 
     // Get the response from n8n (should be the Google Drive link)
     const result = await response.text();
-    console.log('n8n webhook response:', result);
+    console.log('n8n webhook success response:', result);
 
     return new Response(
       JSON.stringify({ 

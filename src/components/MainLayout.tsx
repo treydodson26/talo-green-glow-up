@@ -4,6 +4,7 @@ import TopBar from "@/components/TopBar";
 import ClientsTable from "@/components/ClientsTable";
 import HomePage from "@/components/HomePage";
 import InboxPage from "@/components/InboxPage";
+import InstructorHub from "@/components/InstructorHub";
 
 const MainLayout = () => {
   const [activeRoute, setActiveRoute] = useState("clients");
@@ -12,6 +13,8 @@ const MainLayout = () => {
     switch (activeRoute) {
       case "home":
         return <HomePage />;
+      case "instructor-hub":
+        return <InstructorHub />;
       case "inbox":
         return <InboxPage />;
       case "clients":

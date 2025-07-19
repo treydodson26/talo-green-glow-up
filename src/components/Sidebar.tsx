@@ -7,7 +7,8 @@ import {
   Settings,
   BarChart3,
   MessageSquare,
-  UserPlus
+  UserPlus,
+  GraduationCap
 } from "lucide-react";
 
 interface SidebarProps {
@@ -18,6 +19,7 @@ interface SidebarProps {
 const Sidebar = ({ activeRoute = "home", onRouteChange }: SidebarProps) => {
   const navItems = [
     { id: "home", icon: Home, label: "Home" },
+    { id: "instructor-hub", icon: GraduationCap, label: "Instructor Hub" },
     { id: "inbox", icon: Inbox, label: "Inbox" },
     { id: "customers", icon: UserPlus, label: "Customers" },
     { id: "clients", icon: Users, label: "Clients" },

@@ -33,8 +33,6 @@ const FlyerGenerator = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedFlyers, setGeneratedFlyers] = useState<GeneratedFlyer[]>([]);
   const [copiedId, setCopiedId] = useState<string | null>(null);
-  const [n8nWebhookUrl, setN8nWebhookUrl] = useState("");
-  const [showWebhookConfig, setShowWebhookConfig] = useState(false);
   const { toast } = useToast();
 
   const flyerTemplates = {
@@ -55,16 +53,6 @@ const FlyerGenerator = () => {
       return;
     }
 
-    if (!n8nWebhookUrl) {
-      toast({
-        title: "Error", 
-        description: "Please configure your n8n webhook URL first",
-        variant: "destructive"
-      });
-      setShowWebhookConfig(true);
-      return;
-    }
-
     setIsGenerating(true);
 
     try {
@@ -72,34 +60,26 @@ const FlyerGenerator = () => {
       const baseTemplate = flyerTemplates[flyerType as keyof typeof flyerTemplates];
       const fullPrompt = `${baseTemplate} User requirements: ${prompt}. Style: Professional marketing flyer, high quality, print-ready design.`;
 
-      console.log("Sending to n8n webhook:", n8nWebhookUrl);
-      console.log("Prompt:", fullPrompt);
+      console.log("Generating flyer via Supabase Edge Function");
 
-      // Call n8n webhook with the expected payload structure
-      const response = await fetch(n8nWebhookUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        mode: "cors",
-        body: JSON.stringify({
+      // Call Supabase Edge Function which will call n8n webhook
+      const { data, error } = await supabase.functions.invoke('n8n-flyer-generator', {
+        body: {
           prompt: fullPrompt,
           title: `Tallow-Yoga-${flyerType}-${Date.now()}`
-        }),
+        }
       });
 
-      if (!response.ok) {
-        throw new Error(`Webhook request failed: ${response.status}`);
-      }
+      if (error) throw error;
 
-      // n8n workflow returns the Google Drive link
-      const data = await response.text(); // The webhook responds with just the URL
-      console.log("n8n response:", data);
+      if (!data.success) {
+        throw new Error(data.error || 'Failed to generate flyer');
+      }
 
       const newFlyer: GeneratedFlyer = {
         id: crypto.randomUUID(),
         prompt: prompt,
-        imageUrl: data.trim(), // Google Drive link
+        imageUrl: data.imageUrl,
         createdAt: new Date().toISOString()
       };
 
@@ -115,7 +95,7 @@ const FlyerGenerator = () => {
       console.error("Error generating flyer:", error);
       toast({
         title: "Error generating flyer",
-        description: "Please check your n8n webhook URL and try again.",
+        description: "Please try again or contact support if the issue persists.",
         variant: "destructive"
       });
     } finally {
@@ -164,68 +144,6 @@ const FlyerGenerator = () => {
 
   return (
     <div className="space-y-6">
-      {/* n8n Webhook Configuration */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Settings className="w-5 h-5" />
-            n8n Workflow Configuration
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {!showWebhookConfig && n8nWebhookUrl ? (
-            <div className="flex items-center justify-between p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
-              <div className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-green-600" />
-                <span className="text-sm text-green-700 dark:text-green-300">
-                  n8n webhook configured
-                </span>
-              </div>
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => setShowWebhookConfig(true)}
-              >
-                <Settings className="w-4 h-4 mr-1" />
-                Update
-              </Button>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              <div className="space-y-2">
-                <Label htmlFor="webhookUrl">n8n Webhook URL</Label>
-                <Input
-                  id="webhookUrl"
-                  placeholder="https://your-n8n-instance.com/webhook/20bd4317-eabe-4e69-8932-0199a7e60418"
-                  value={n8nWebhookUrl}
-                  onChange={(e) => setN8nWebhookUrl(e.target.value)}
-                />
-                <p className="text-xs text-muted-foreground">
-                  Enter your n8n webhook URL that triggers the image generation workflow
-                </p>
-              </div>
-              
-              <div className="flex gap-2">
-                <Button 
-                  onClick={() => setShowWebhookConfig(false)}
-                  disabled={!n8nWebhookUrl}
-                >
-                  Save Configuration
-                </Button>
-                {showWebhookConfig && n8nWebhookUrl && (
-                  <Button 
-                    variant="outline"
-                    onClick={() => setShowWebhookConfig(false)}
-                  >
-                    Cancel
-                  </Button>
-                )}
-              </div>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
       {/* Generation Form */}
       <Card>
         <CardHeader>
@@ -266,7 +184,7 @@ const FlyerGenerator = () => {
 
           <Button 
             onClick={handleGenerate} 
-            disabled={isGenerating || !prompt.trim() || !n8nWebhookUrl}
+            disabled={isGenerating || !prompt.trim()}
             className="w-full"
           >
             {isGenerating ? (

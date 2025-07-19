@@ -111,6 +111,7 @@ export default function Auth({ onSuccess }: AuthProps) {
           
           <Button 
             type="submit" 
+            variant="black"
             className="w-full" 
             disabled={isLoading}
           >

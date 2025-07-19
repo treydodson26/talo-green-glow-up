@@ -22,6 +22,8 @@ serve(async (req) => {
     console.log('Calling n8n webhook with:', { prompt, title });
 
     const N8N_WEBHOOK_URL = "https://treydodson26.app.n8n.cloud/webhook/20bd4317-eabe-4e69-8932-0199a7e60418";
+    
+    console.log('Using webhook URL:', N8N_WEBHOOK_URL);
 
     // Call n8n webhook
     const response = await fetch(N8N_WEBHOOK_URL, {

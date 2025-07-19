@@ -13,7 +13,9 @@ import {
   Wand2, 
   RefreshCw,
   Copy,
-  Check
+  Check,
+  Settings,
+  ExternalLink
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -31,6 +33,8 @@ const FlyerGenerator = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedFlyers, setGeneratedFlyers] = useState<GeneratedFlyer[]>([]);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [n8nWebhookUrl, setN8nWebhookUrl] = useState("");
+  const [showWebhookConfig, setShowWebhookConfig] = useState(false);
   const { toast } = useToast();
 
   const flyerTemplates = {
@@ -51,6 +55,16 @@ const FlyerGenerator = () => {
       return;
     }
 
+    if (!n8nWebhookUrl) {
+      toast({
+        title: "Error", 
+        description: "Please configure your n8n webhook URL first",
+        variant: "destructive"
+      });
+      setShowWebhookConfig(true);
+      return;
+    }
+
     setIsGenerating(true);
 
     try {
@@ -58,18 +72,34 @@ const FlyerGenerator = () => {
       const baseTemplate = flyerTemplates[flyerType as keyof typeof flyerTemplates];
       const fullPrompt = `${baseTemplate} User requirements: ${prompt}. Style: Professional marketing flyer, high quality, print-ready design.`;
 
-      console.log("Generating flyer with prompt:", fullPrompt);
+      console.log("Sending to n8n webhook:", n8nWebhookUrl);
+      console.log("Prompt:", fullPrompt);
 
-      const { data, error } = await supabase.functions.invoke('generate-flyer', {
-        body: { prompt: fullPrompt }
+      // Call n8n webhook with the expected payload structure
+      const response = await fetch(n8nWebhookUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        mode: "cors",
+        body: JSON.stringify({
+          prompt: fullPrompt,
+          title: `Tallow-Yoga-${flyerType}-${Date.now()}`
+        }),
       });
 
-      if (error) throw error;
+      if (!response.ok) {
+        throw new Error(`Webhook request failed: ${response.status}`);
+      }
+
+      // n8n workflow returns the Google Drive link
+      const data = await response.text(); // The webhook responds with just the URL
+      console.log("n8n response:", data);
 
       const newFlyer: GeneratedFlyer = {
         id: crypto.randomUUID(),
         prompt: prompt,
-        imageUrl: data.image,
+        imageUrl: data.trim(), // Google Drive link
         createdAt: new Date().toISOString()
       };
 
@@ -78,14 +108,14 @@ const FlyerGenerator = () => {
 
       toast({
         title: "Flyer generated successfully!",
-        description: "Your marketing flyer is ready to use.",
+        description: "Your marketing flyer has been created and saved to Google Drive.",
       });
 
     } catch (error) {
       console.error("Error generating flyer:", error);
       toast({
         title: "Error generating flyer",
-        description: "Please try again or contact support if the issue persists.",
+        description: "Please check your n8n webhook URL and try again.",
         variant: "destructive"
       });
     } finally {
@@ -134,6 +164,68 @@ const FlyerGenerator = () => {
 
   return (
     <div className="space-y-6">
+      {/* n8n Webhook Configuration */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Settings className="w-5 h-5" />
+            n8n Workflow Configuration
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {!showWebhookConfig && n8nWebhookUrl ? (
+            <div className="flex items-center justify-between p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+              <div className="flex items-center gap-2">
+                <Check className="w-4 h-4 text-green-600" />
+                <span className="text-sm text-green-700 dark:text-green-300">
+                  n8n webhook configured
+                </span>
+              </div>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => setShowWebhookConfig(true)}
+              >
+                <Settings className="w-4 h-4 mr-1" />
+                Update
+              </Button>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              <div className="space-y-2">
+                <Label htmlFor="webhookUrl">n8n Webhook URL</Label>
+                <Input
+                  id="webhookUrl"
+                  placeholder="https://your-n8n-instance.com/webhook/20bd4317-eabe-4e69-8932-0199a7e60418"
+                  value={n8nWebhookUrl}
+                  onChange={(e) => setN8nWebhookUrl(e.target.value)}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Enter your n8n webhook URL that triggers the image generation workflow
+                </p>
+              </div>
+              
+              <div className="flex gap-2">
+                <Button 
+                  onClick={() => setShowWebhookConfig(false)}
+                  disabled={!n8nWebhookUrl}
+                >
+                  Save Configuration
+                </Button>
+                {showWebhookConfig && n8nWebhookUrl && (
+                  <Button 
+                    variant="outline"
+                    onClick={() => setShowWebhookConfig(false)}
+                  >
+                    Cancel
+                  </Button>
+                )}
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
       {/* Generation Form */}
       <Card>
         <CardHeader>
@@ -174,13 +266,13 @@ const FlyerGenerator = () => {
 
           <Button 
             onClick={handleGenerate} 
-            disabled={isGenerating || !prompt.trim()}
+            disabled={isGenerating || !prompt.trim() || !n8nWebhookUrl}
             className="w-full"
           >
             {isGenerating ? (
               <>
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Generating Flyer...
+                Generating Flyer via n8n...
               </>
             ) : (
               <>
@@ -211,28 +303,28 @@ const FlyerGenerator = () => {
                       alt="Generated flyer"
                       className="w-full aspect-[4/5] object-cover rounded-lg border"
                     />
-                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-2">
-                      <Button
-                        size="sm"
-                        variant="secondary"
-                        onClick={() => handleDownload(flyer.imageUrl, flyer.prompt)}
-                      >
-                        <Download className="w-4 h-4 mr-1" />
-                        Download
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="secondary"
-                        onClick={() => handleCopyPrompt(flyer.prompt, flyer.id)}
-                      >
-                        {copiedId === flyer.id ? (
-                          <Check className="w-4 h-4 mr-1" />
-                        ) : (
-                          <Copy className="w-4 h-4 mr-1" />
-                        )}
-                        {copiedId === flyer.id ? 'Copied' : 'Copy'}
-                      </Button>
-                    </div>
+                     <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-2">
+                       <Button
+                         size="sm"
+                         variant="secondary"
+                         onClick={() => window.open(flyer.imageUrl, '_blank')}
+                       >
+                         <ExternalLink className="w-4 h-4 mr-1" />
+                         Open in Drive
+                       </Button>
+                       <Button
+                         size="sm"
+                         variant="secondary"
+                         onClick={() => handleCopyPrompt(flyer.prompt, flyer.id)}
+                       >
+                         {copiedId === flyer.id ? (
+                           <Check className="w-4 h-4 mr-1" />
+                         ) : (
+                           <Copy className="w-4 h-4 mr-1" />
+                         )}
+                         {copiedId === flyer.id ? 'Copied' : 'Copy'}
+                       </Button>
+                     </div>
                   </div>
                   
                   <div className="space-y-1">

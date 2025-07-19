@@ -2,9 +2,10 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Phone, Mail, MoreHorizontal, Calendar, Clock } from "lucide-react";
+import { Phone, Mail, MoreHorizontal, Calendar, Clock, Check } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import MessageModal from "@/components/MessageModal";
 
 interface Customer {
   id: number;
@@ -33,6 +34,11 @@ const IntroOffersSections = () => {
   const [customersByDay, setCustomersByDay] = useState<{ [key: number]: Customer[] }>({});
   const [messageSequences, setMessageSequences] = useState<MessageSequence[]>([]);
   const [loading, setLoading] = useState(true);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
+  const [selectedMessageType, setSelectedMessageType] = useState<'email' | 'text'>('email');
+  const [selectedTemplate, setSelectedTemplate] = useState<MessageSequence | null>(null);
+  const [sentMessages, setSentMessages] = useState<Set<string>>(new Set());
   const { toast } = useToast();
 
   useEffect(() => {
@@ -100,6 +106,82 @@ const IntroOffersSections = () => {
         {messageType === 'email' ? 'Email' : 'Text'}
       </Badge>
     );
+  };
+
+  const handleSendMessage = (customer: Customer, messageType: 'email' | 'text', sequence: MessageSequence) => {
+    setSelectedCustomer(customer);
+    setSelectedMessageType(messageType);
+    setSelectedTemplate(sequence);
+    setModalOpen(true);
+  };
+
+  const onSendMessage = async (messageData: {
+    customerId: number;
+    messageType: 'email' | 'text';
+    subject?: string;
+    content: string;
+    recipient: string;
+  }) => {
+    try {
+      if (messageData.messageType === 'email') {
+        // Send email via Gmail API Edge function
+        const { error } = await supabase.functions.invoke('send-gmail-message', {
+          body: {
+            to: messageData.recipient,
+            subject: messageData.subject,
+            content: messageData.content,
+            customer_id: messageData.customerId
+          }
+        });
+
+        if (error) throw error;
+      } else {
+        // Send WhatsApp message (existing function)
+        const { error } = await supabase.functions.invoke('send-whatsapp-message', {
+          body: {
+            phone_number: messageData.recipient,
+            message: messageData.content,
+            customer_id: messageData.customerId
+          }
+        });
+
+        if (error) throw error;
+      }
+
+      // Log the communication
+      const { error: logError } = await supabase
+        .from('communications_log')
+        .insert({
+          customer_id: messageData.customerId,
+          message_sequence_id: selectedTemplate?.id || 0,
+          message_type: messageData.messageType,
+          content: messageData.content,
+          subject: messageData.subject,
+          recipient_email: messageData.messageType === 'email' ? messageData.recipient : null,
+          recipient_phone: messageData.messageType === 'text' ? messageData.recipient : null,
+          delivery_status: 'sent',
+          sent_at: new Date().toISOString()
+        });
+
+      if (logError) throw logError;
+
+      // Add to sent messages for UI indication
+      const messageKey = `${messageData.customerId}-${messageData.messageType}`;
+      setSentMessages(prev => new Set([...prev, messageKey]));
+
+      toast({
+        title: "Message sent successfully",
+        description: `${messageData.messageType === 'email' ? 'Email' : 'Text'} sent to ${selectedCustomer?.first_name} ${selectedCustomer?.last_name}`,
+      });
+
+    } catch (error) {
+      console.error('Error sending message:', error);
+      toast({
+        title: "Error sending message",
+        description: "Failed to send message. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   if (loading) {
@@ -193,14 +275,35 @@ const IntroOffersSections = () => {
                         </div>
 
                         <div className="flex items-center gap-2">
-                          <Button variant="outline" size="sm">
-                            <Phone className="w-4 h-4 mr-1" />
+                          {/* Text Message Button */}
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => handleSendMessage(customer, 'text', sequence)}
+                            disabled={!customer.phone_number}
+                          >
+                            {sentMessages.has(`${customer.id}-text`) ? (
+                              <Check className="w-4 h-4 mr-1 text-green-600" />
+                            ) : (
+                              <Phone className="w-4 h-4 mr-1" />
+                            )}
                             Text
                           </Button>
-                          <Button variant="outline" size="sm">
-                            <Mail className="w-4 h-4 mr-1" />
+                          
+                          {/* Email Button */}
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => handleSendMessage(customer, 'email', sequence)}
+                          >
+                            {sentMessages.has(`${customer.id}-email`) ? (
+                              <Check className="w-4 h-4 mr-1 text-green-600" />
+                            ) : (
+                              <Mail className="w-4 h-4 mr-1" />
+                            )}
                             Email
                           </Button>
+                          
                           <Button variant="ghost" size="sm">
                             <MoreHorizontal className="w-4 h-4" />
                           </Button>
@@ -214,6 +317,21 @@ const IntroOffersSections = () => {
           );
         })}
       </div>
+
+      {/* Message Modal */}
+      {selectedCustomer && selectedTemplate && (
+        <MessageModal
+          isOpen={modalOpen}
+          onClose={() => setModalOpen(false)}
+          customer={selectedCustomer}
+          messageType={selectedMessageType}
+          template={{
+            subject: selectedTemplate.subject,
+            content: selectedTemplate.content
+          }}
+          onSend={onSendMessage}
+        />
+      )}
     </div>
   );
 };

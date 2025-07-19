@@ -6,6 +6,7 @@ import HomePage from "@/components/HomePage";
 import InboxPage from "@/components/InboxPage";
 import InstructorHub from "@/components/InstructorHub";
 import OperationsHub from "@/components/OperationsHub";
+import MarketingHub from "@/components/MarketingHub";
 
 const MainLayout = () => {
   const [activeRoute, setActiveRoute] = useState("customers");
@@ -18,6 +19,8 @@ const MainLayout = () => {
         return <InstructorHub />;
       case "operations-hub":
         return <OperationsHub />;
+      case "marketing-hub":
+        return <MarketingHub />;
       case "inbox":
         return <InboxPage />;
       case "customers":

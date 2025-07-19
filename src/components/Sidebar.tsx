@@ -9,7 +9,8 @@ import {
   MessageSquare,
   UserPlus,
   GraduationCap,
-  Cog
+  Cog,
+  Megaphone
 } from "lucide-react";
 
 interface SidebarProps {
@@ -22,6 +23,7 @@ const Sidebar = ({ activeRoute = "home", onRouteChange }: SidebarProps) => {
     { id: "home", icon: Home, label: "Home" },
     { id: "instructor-hub", icon: GraduationCap, label: "Instructor Hub" },
     { id: "operations-hub", icon: Cog, label: "Operations Hub" },
+    { id: "marketing-hub", icon: Megaphone, label: "Marketing Hub" },
     { id: "inbox", icon: Inbox, label: "Inbox" },
     { id: "customers", icon: UserPlus, label: "Customers" },
     { id: "segments", icon: BarChart3, label: "Segments" },

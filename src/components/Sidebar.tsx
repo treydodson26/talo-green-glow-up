@@ -24,7 +24,6 @@ const Sidebar = ({ activeRoute = "home", onRouteChange }: SidebarProps) => {
     { id: "operations-hub", icon: Cog, label: "Operations Hub" },
     { id: "inbox", icon: Inbox, label: "Inbox" },
     { id: "customers", icon: UserPlus, label: "Customers" },
-    { id: "clients", icon: Users, label: "Clients" },
     { id: "segments", icon: BarChart3, label: "Segments" },
     { id: "comments", icon: MessageSquare, label: "Comments" },
     { id: "settings", icon: Settings, label: "Settings" },

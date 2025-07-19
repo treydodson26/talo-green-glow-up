@@ -8,7 +8,7 @@ import InstructorHub from "@/components/InstructorHub";
 import OperationsHub from "@/components/OperationsHub";
 
 const MainLayout = () => {
-  const [activeRoute, setActiveRoute] = useState("clients");
+  const [activeRoute, setActiveRoute] = useState("customers");
 
   const renderContent = () => {
     switch (activeRoute) {
@@ -20,10 +20,8 @@ const MainLayout = () => {
         return <OperationsHub />;
       case "inbox":
         return <InboxPage />;
-      case "clients":
-        return <ClientsTable />;
       case "customers":
-        return <ClientsTable />; // Same as clients for now
+        return <ClientsTable />;
       case "segments":
         return (
           <div className="flex-1 p-6 bg-background">

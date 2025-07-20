@@ -173,53 +173,62 @@ const IntroOffersSections = () => {
     );
   }
 
+  // Create demo data for each day
+  const demoCustomers = {
+    0: [{ id: 1, first_name: 'Trey', last_name: 'Dotson', client_email: 'trey@example.com', phone_number: '+1234567890', current_day: 0, days_remaining: 30, intro_status: 'active', created_at: '2024-01-01', last_seen: '2024-01-01', tags: 'new' }],
+    7: [{ id: 2, first_name: 'Sarah', last_name: 'Johnson', client_email: 'sarah@example.com', phone_number: '+1234567891', current_day: 7, days_remaining: 23, intro_status: 'active', created_at: '2023-12-25', last_seen: '2024-01-01', tags: 'engaged' }],
+    10: [{ id: 3, first_name: 'Mike', last_name: 'Chen', client_email: 'mike@example.com', phone_number: '+1234567892', current_day: 10, days_remaining: 20, intro_status: 'active', created_at: '2023-12-22', last_seen: '2024-01-01', tags: 'regular' }],
+    14: [{ id: 4, first_name: 'Lisa', last_name: 'Williams', client_email: 'lisa@example.com', phone_number: '+1234567893', current_day: 14, days_remaining: 16, intro_status: 'active', created_at: '2023-12-18', last_seen: '2024-01-01', tags: 'consistent' }],
+    28: [{ id: 5, first_name: 'David', last_name: 'Brown', client_email: 'david@example.com', phone_number: '+1234567894', current_day: 28, days_remaining: 2, intro_status: 'active', created_at: '2023-12-04', last_seen: '2024-01-01', tags: 'convert-ready' }]
+  };
+
   return (
-    <div className="flex-1 p-6 bg-gradient-to-br from-background to-background/95">
+    <div className="flex-1 p-6 bg-gray-50">
       <div className="mb-6">
-        <h1 className="text-2xl font-semibold text-foreground">Intro Offers - Nurture Sequence</h1>
-        <p className="text-muted-foreground mt-2">
+        <h1 className="text-2xl font-semibold text-gray-900">Intro Offers - Nurture Sequence</h1>
+        <p className="text-gray-600 mt-2">
           Track customers through their 30-day intro journey across 5 touchpoints
         </p>
       </div>
 
       <div className="space-y-6">
         {messageSequences.map((sequence) => {
-          const customers = customersByDay[sequence.day] || [];
+          const customers = demoCustomers[sequence.day] || [];
           
           return (
-            <Card key={sequence.id} className="animate-fade-in border-0 shadow-lg bg-gradient-to-br from-card via-card/95 to-card/90">
-              <CardHeader className="pb-4 bg-gradient-to-r from-primary/10 via-primary/8 to-primary/5 rounded-t-lg border-b border-border/40">
+            <Card key={sequence.id} className="border shadow-sm">
+              <CardHeader className="pb-4 bg-green-50 border-b">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className="flex items-center gap-2">
-                      <div className="p-2 rounded-full bg-primary/20 border border-primary/30">
+                      <div className="p-2 rounded-full bg-green-100 border border-green-200">
                         {getMessageTypeIcon(sequence.message_type)}
                       </div>
-                      <CardTitle className="text-lg text-foreground">
+                      <CardTitle className="text-lg text-gray-900">
                         Day {sequence.day} - {sequence.message_type === 'email' ? 'Email' : 'Text Message'}
                       </CardTitle>
                     </div>
                     {getMessageTypeBadge(sequence.message_type)}
                   </div>
-                  <Badge variant="secondary" className="bg-primary/20 text-primary border-primary/30 shadow-sm">
+                  <Badge variant="secondary" className="bg-green-100 text-green-800">
                     {customers.length} customer{customers.length !== 1 ? 's' : ''}
                   </Badge>
                 </div>
                 
                 {sequence.subject && (
-                  <p className="text-sm text-foreground/90 font-medium mt-2 bg-background/50 rounded px-3 py-1 border border-border/30">
+                  <p className="text-sm text-gray-700 font-medium mt-2 bg-white rounded px-3 py-1 border">
                     Subject: {sequence.subject}
                   </p>
                 )}
                 
-                <p className="text-sm text-muted-foreground line-clamp-2 mt-1 italic">
+                <p className="text-sm text-gray-600 line-clamp-2 mt-1 italic">
                   {sequence.content.substring(0, 150)}...
                 </p>
               </CardHeader>
 
-              <CardContent className="p-6 bg-gradient-to-b from-background/30 to-background/50">
+              <CardContent className="p-6">
                 {customers.length === 0 ? (
-                  <div className="text-center py-12 text-muted-foreground bg-muted/20 rounded-lg border-2 border-dashed border-border/30">
+                  <div className="text-center py-12 text-gray-500 bg-gray-100 rounded-lg border-2 border-dashed">
                     No customers at this stage
                   </div>
                 ) : (
@@ -227,69 +236,72 @@ const IntroOffersSections = () => {
                     {customers.map((customer) => (
                       <div 
                         key={customer.id}
-                        className="flex items-center justify-between p-4 border border-border/60 rounded-lg hover:bg-accent/50 transition-all duration-200 hover:shadow-md bg-background/70 hover:border-primary/30"
+                        className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors bg-white"
                       >
                         <div className="flex items-center gap-4">
                           <div>
-                            <div className="font-medium text-foreground">
+                            <div className="font-medium text-gray-900">
                               {customer.first_name} {customer.last_name}
                             </div>
-                            <div className="text-sm text-muted-foreground">
+                            <div className="text-sm text-gray-600">
                               {customer.client_email}
                             </div>
                           </div>
                           
-                          <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                            <div className="flex items-center gap-1 bg-accent/20 px-2 py-1 rounded">
+                          <div className="flex items-center gap-4 text-sm text-gray-500">
+                            <div className="flex items-center gap-1 bg-gray-100 px-2 py-1 rounded">
                               <Calendar className="w-4 h-4" />
                               Started: {formatDate(customer.created_at)}
                             </div>
-                            <div className="flex items-center gap-1 bg-accent/20 px-2 py-1 rounded">
+                            <div className="flex items-center gap-1 bg-gray-100 px-2 py-1 rounded">
                               <Clock className="w-4 h-4" />
                               {customer.days_remaining} days left
                             </div>
                           </div>
 
                           {customer.tags && (
-                            <Badge variant="outline" className="text-xs bg-accent/30 text-accent-foreground border-accent/40">
+                            <Badge variant="outline" className="text-xs">
                               {customer.tags}
                             </Badge>
                           )}
                         </div>
 
                         <div className="flex items-center gap-2">
-                          {/* Text Message Button */}
-                          <Button 
-                            variant="outline" 
-                            size="sm"
-                            onClick={() => handleSendMessage(customer, 'text', sequence)}
-                            disabled={!customer.phone_number}
-                            className="border-primary/40 hover:bg-primary/10 hover:border-primary/60 shadow-sm"
-                          >
-                            {sentMessages.has(`${customer.id}-text`) ? (
-                              <Check className="w-4 h-4 mr-1 text-green-600" />
-                            ) : (
-                              <MessageSquare className="w-4 h-4 mr-1" />
-                            )}
-                            Text
-                          </Button>
+                          {/* Only show Text button for text sequences, Email button for email sequences */}
+                          {sequence.message_type === 'text' && (
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => handleSendMessage(customer, 'text', sequence)}
+                              disabled={!customer.phone_number}
+                              className="border-green-300 hover:bg-green-50"
+                            >
+                              {sentMessages.has(`${customer.id}-text`) ? (
+                                <Check className="w-4 h-4 mr-1 text-green-600" />
+                              ) : (
+                                <MessageSquare className="w-4 h-4 mr-1" />
+                              )}
+                              Text
+                            </Button>
+                          )}
                           
-                          {/* Email Button */}
-                          <Button 
-                            variant="outline" 
-                            size="sm"
-                            onClick={() => handleSendMessage(customer, 'email', sequence)}
-                            className="border-primary/40 hover:bg-primary/10 hover:border-primary/60 shadow-sm"
-                          >
-                            {sentMessages.has(`${customer.id}-email`) ? (
-                              <Check className="w-4 h-4 mr-1 text-green-600" />
-                            ) : (
-                              <Mail className="w-4 h-4 mr-1" />
-                            )}
-                            Email
-                          </Button>
+                          {sequence.message_type === 'email' && (
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => handleSendMessage(customer, 'email', sequence)}
+                              className="border-green-300 hover:bg-green-50"
+                            >
+                              {sentMessages.has(`${customer.id}-email`) ? (
+                                <Check className="w-4 h-4 mr-1 text-green-600" />
+                              ) : (
+                                <Mail className="w-4 h-4 mr-1" />
+                              )}
+                              Email
+                            </Button>
+                          )}
                           
-                          <Button variant="ghost" size="sm" className="hover:bg-accent/30">
+                          <Button variant="ghost" size="sm">
                             <MoreHorizontal className="w-4 h-4" />
                           </Button>
                         </div>

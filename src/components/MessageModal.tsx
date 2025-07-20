@@ -165,9 +165,9 @@ const MessageModal = ({
             {/* Template Variables Help */}
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
               <span>Available variables:</span>
-              <code className="px-1.5 py-0.5 bg-muted rounded text-xs">{{`first_name`}}</code>
-              <code className="px-1.5 py-0.5 bg-muted rounded text-xs">{{`last_name`}}</code>
-              <code className="px-1.5 py-0.5 bg-muted rounded text-xs">{{`full_name`}}</code>
+              <code className="px-1.5 py-0.5 bg-muted rounded text-xs">{"{{first_name}}"}</code>
+              <code className="px-1.5 py-0.5 bg-muted rounded text-xs">{"{{last_name}}"}</code>
+              <code className="px-1.5 py-0.5 bg-muted rounded text-xs">{"{{full_name}}"}</code>
             </div>
 
             {/* Preview */}

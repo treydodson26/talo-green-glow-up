@@ -1,7 +1,8 @@
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { AlertTriangle, Clock, Phone, MessageSquare } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { CheckCircle, Clock, Users, Phone, MessageSquare } from "lucide-react";
 import { useIntroCustomers, useTodaysClasses, useRecentLeads } from "@/hooks/useDashboard";
 
 export const UrgentActions = () => {
@@ -9,7 +10,7 @@ export const UrgentActions = () => {
   const { data: todaysClasses } = useTodaysClasses();
   const { data: recentLeads } = useRecentLeads();
 
-  // Calculate urgent items
+  // Calculate important items (not urgent)
   const expiringToday = introCustomers?.filter(customer => {
     const endDate = new Date(customer.intro_end_date);
     const tomorrow = new Date();
@@ -23,65 +24,90 @@ export const UrgentActions = () => {
     lead.status === 'new' && !lead.last_contact_date
   ) || [];
 
-  const urgentItems = [
+  const actionItems = [
     ...expiringToday.map(customer => ({
       type: 'expiring',
+      title: 'Intro Offer Ending',
       message: `${customer.first_name} ${customer.last_name}'s intro expires tomorrow`,
-      action: 'Send conversion message',
+      action: 'Send follow-up',
       icon: Clock,
-      variant: 'destructive' as const
+      priority: 'high' as const,
+      color: 'amber'
     })),
     ...needsSubstitute.map(cls => ({
       type: 'substitute',
-      message: `${cls.class_time} ${cls.class_name} needs substitute`,
-      action: 'Find coverage',
-      icon: AlertTriangle,
-      variant: 'destructive' as const
+      title: 'Coverage Needed',
+      message: `${cls.class_time} ${cls.class_name} needs an instructor`,
+      action: 'Find substitute',
+      icon: Users,
+      priority: 'high' as const,
+      color: 'orange'
     })),
     ...uncontactedLeads.map(lead => ({
       type: 'contact',
-      message: `${lead.first_name} ${lead.last_name} hasn't been contacted`,
-      action: 'Call now',
+      title: 'New Lead Follow-up',
+      message: `${lead.first_name} ${lead.last_name} is waiting for contact`,
+      action: 'Reach out',
       icon: Phone,
-      variant: 'default' as const
+      priority: 'medium' as const,
+      color: 'blue'
     }))
   ];
 
-  if (urgentItems.length === 0) {
+  if (actionItems.length === 0) {
     return (
-      <Alert className="border-green-200 bg-green-50">
-        <AlertTriangle className="h-4 w-4 text-green-600" />
-        <AlertDescription className="text-green-800">
-          Great work! No urgent actions needed right now.
-        </AlertDescription>
-      </Alert>
+      <Card className="border-green-200/50 bg-gradient-to-r from-green-50/50 via-green-50/30 to-transparent">
+        <CardContent className="p-6">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-green-100 rounded-full">
+              <CheckCircle className="h-5 w-5 text-green-600" />
+            </div>
+            <div>
+              <h3 className="font-medium text-green-900">All caught up!</h3>
+              <p className="text-green-700 text-sm">No immediate actions needed right now.</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     );
   }
 
   return (
-    <div className="space-y-2">
-      {urgentItems.map((item, index) => (
-        <Alert key={index} className={`border-red-200 bg-red-50 ${item.variant === 'destructive' ? 'border-red-300' : 'border-yellow-300'}`}>
-          <item.icon className={`h-4 w-4 ${item.variant === 'destructive' ? 'text-red-600' : 'text-yellow-600'}`} />
-          <AlertDescription className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <span className={item.variant === 'destructive' ? 'text-red-800' : 'text-yellow-800'}>
-                {item.message}
-              </span>
-              <Badge variant={item.variant} className="text-xs">
-                URGENT
-              </Badge>
+    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
+      {actionItems.map((item, index) => (
+        <Card key={index} className="border-l-4 border-l-primary/30 hover:border-l-primary/60 transition-colors">
+          <CardContent className="p-4">
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex items-start gap-3 flex-1">
+                <div className="p-2 bg-primary/10 rounded-full mt-0.5">
+                  <item.icon className="h-4 w-4 text-primary" />
+                </div>
+                <div className="space-y-1 flex-1">
+                  <div className="flex items-center gap-2">
+                    <h4 className="font-medium text-foreground text-sm">{item.title}</h4>
+                    <Badge 
+                      variant={item.priority === 'high' ? 'default' : 'secondary'} 
+                      className="text-xs px-2 py-0"
+                    >
+                      {item.priority}
+                    </Badge>
+                  </div>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    {item.message}
+                  </p>
+                </div>
+              </div>
+              <Button 
+                size="sm" 
+                variant="outline"
+                className="flex items-center gap-1 bg-primary/5 hover:bg-primary/10 border-primary/20 hover:border-primary/30 text-primary hover:text-primary shrink-0"
+              >
+                <MessageSquare className="h-3 w-3" />
+                {item.action}
+              </Button>
             </div>
-            <Button 
-              size="sm" 
-              variant={item.variant} 
-              className="ml-4 flex items-center gap-1"
-            >
-              <MessageSquare className="h-3 w-3" />
-              {item.action}
-            </Button>
-          </AlertDescription>
-        </Alert>
+          </CardContent>
+        </Card>
       ))}
     </div>
   );

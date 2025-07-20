@@ -27,8 +27,8 @@ export const MetricsCards = () => {
   const capacityColor = (metrics?.avg_capacity_today || 0) >= 80 
     ? "text-green-600" 
     : (metrics?.avg_capacity_today || 0) >= 50 
-    ? "text-yellow-600" 
-    : "text-red-600";
+    ? "text-amber-600" 
+    : "text-orange-600";
 
   const revenueChange = metrics?.revenue_this_month && metrics?.revenue_last_month 
     ? ((metrics.revenue_this_month - metrics.revenue_last_month) / metrics.revenue_last_month) * 100 
@@ -49,7 +49,7 @@ export const MetricsCards = () => {
               {metrics?.avg_capacity_today?.toFixed(1) || 0}% avg capacity
             </span>
             {(metrics?.waitlisted_classes || 0) > 0 && (
-              <Badge variant="destructive" className="text-xs">
+              <Badge variant="secondary" className="text-xs bg-amber-100 text-amber-700 border-amber-200">
                 {metrics?.waitlisted_classes} waitlisted
               </Badge>
             )}
@@ -67,7 +67,7 @@ export const MetricsCards = () => {
           <div className="text-2xl font-bold text-foreground">{metrics?.active_intro_offers || 0}</div>
           <div className="flex items-center gap-2 text-xs">
             {(metrics?.ending_this_week || 0) > 0 ? (
-              <Badge variant="destructive" className="text-xs">
+              <Badge variant="secondary" className="text-xs bg-amber-100 text-amber-700 border-amber-200">
                 {metrics?.ending_this_week} ending this week
               </Badge>
             ) : (

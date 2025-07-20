@@ -22,6 +22,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import IntroOffersSections from "@/components/IntroOffersSections";
 import WhatsAppMessaging from "@/components/WhatsAppMessaging";
+import AddCustomerDialog from "@/components/AddCustomerDialog";
 
 interface Customer {
   id: number;
@@ -47,6 +48,7 @@ const ClientsTable = () => {
   const [totalIntroOfferCount, setTotalIntroOfferCount] = useState(0);
   const [showAllIntroOffers, setShowAllIntroOffers] = useState(false);
   const [activeTab, setActiveTab] = useState("clients"); // Add tab state
+  const [showAddDialog, setShowAddDialog] = useState(false); // Add dialog state
   const { toast } = useToast();
 
   const filters = [
@@ -125,6 +127,11 @@ const ClientsTable = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Function to refresh customers after adding a new one
+  const handleCustomerAdded = () => {
+    loadCustomers();
   };
 
   // Set up real-time subscription and reload when filter changes
@@ -235,12 +242,7 @@ const ClientsTable = () => {
           </DropdownMenu>
           <Button 
             className="bg-primary hover:bg-primary/90 gap-2"
-            onClick={() => {
-              toast({
-                title: "Add New Client",
-                description: "Client creation dialog will be implemented soon.",
-              });
-            }}
+            onClick={() => setShowAddDialog(true)}
           >
             <Plus className="h-4 w-4" />
             Add new
@@ -500,6 +502,13 @@ const ClientsTable = () => {
           <WhatsAppMessaging />
         </TabsContent>
       </Tabs>
+
+      {/* Add Customer Dialog */}
+      <AddCustomerDialog
+        open={showAddDialog}
+        onOpenChange={setShowAddDialog}
+        onCustomerAdded={handleCustomerAdded}
+      />
     </div>
   );
 };

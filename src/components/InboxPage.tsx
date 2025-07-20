@@ -81,12 +81,12 @@ const InboxPage = () => {
     try {
       setLoading(true);
       
-      // First try to join with customers table, but handle case where customer doesn't exist
+      // Join with customers table to get customer names
       const { data, error } = await supabase
         .from('communications_log')
         .select(`
           *,
-          customers (
+          customers!inner(
             first_name,
             last_name,
             client_email
@@ -96,25 +96,14 @@ const InboxPage = () => {
 
       if (error) throw error;
 
-      console.log('Raw communications data:', data);
+      // Transform the data to flatten customer info
+      const transformedData = data?.map((item: any) => ({
+        ...item,
+        message_type: item.message_type as 'email' | 'text',
+        customer_name: `${item.customers.first_name} ${item.customers.last_name}`,
+        customer_email: item.customers.client_email
+      })) || [];
 
-      // Transform the data to flatten customer info, with fallbacks
-      const transformedData = data?.map((item: any) => {
-        // Handle case where customer relationship doesn't exist
-        const customerData = item.customers || {};
-        const customerName = customerData.first_name && customerData.last_name 
-          ? `${customerData.first_name} ${customerData.last_name}`
-          : `Customer ${item.customer_id}`;
-        
-        return {
-          ...item,
-          message_type: item.message_type as 'email' | 'text',
-          customer_name: customerName,
-          customer_email: customerData.client_email || item.recipient_email || 'Unknown'
-        };
-      }) || [];
-
-      console.log('Transformed communications data:', transformedData);
       setCommunications(transformedData as CommunicationItem[]);
     } catch (error) {
       console.error('Error loading communications:', error);

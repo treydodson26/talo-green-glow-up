@@ -32,13 +32,13 @@ const HomePage = () => {
     <div className="flex-1 p-8 bg-gradient-to-br from-background via-background to-accent/20 min-h-screen">
       {/* Welcome Header */}
       <div className="mb-12">
-        <Card className="border-0 bg-gradient-to-r from-green-500/20 via-green-400/15 to-green-300/10 shadow-none">
+        <Card className="border-0 bg-gradient-to-r from-primary/5 via-primary/3 to-transparent shadow-none">
           <CardContent className="p-8">
             <div className="flex items-center justify-between">
               <div className="space-y-2">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-green-500/20 rounded-full">
-                    <Sparkles className="h-5 w-5 text-green-600" />
+                  <div className="p-2 bg-primary/10 rounded-full">
+                    <Sparkles className="h-5 w-5 text-primary" />
                   </div>
                   <h1 className="text-4xl font-light text-foreground">
                     {greeting()}, Emily
@@ -50,7 +50,7 @@ const HomePage = () => {
               </div>
               <div className="text-right space-y-1">
                 <div className="flex items-center gap-3 text-foreground">
-                  <Calendar className="h-5 w-5 text-green-600" />
+                  <Calendar className="h-5 w-5 text-primary" />
                   <span className="text-lg font-medium">{currentDate}</span>
                 </div>
                 <div className="text-muted-foreground ml-8">
@@ -65,7 +65,7 @@ const HomePage = () => {
       {/* Key Metrics Overview */}
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-6">
-          <div className="w-1 h-6 bg-green-500 rounded-full"></div>
+          <div className="w-1 h-6 bg-primary rounded-full"></div>
           <h2 className="text-xl font-medium text-foreground">Studio Overview</h2>
         </div>
         <MetricsCards />

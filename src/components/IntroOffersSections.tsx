@@ -74,25 +74,6 @@ const IntroOffersSections = () => {
         return acc;
       }, {} as { [key: number]: Customer[] }) || {};
 
-      // Add Trey Dotson to Day 7 for demo purposes
-      if (!grouped[7]) grouped[7] = [];
-      const treyCustomer: Customer = {
-        id: 999,
-        first_name: 'Trey',
-        last_name: 'Dotson',
-        client_email: 'trey@example.com',
-        phone_number: '+1234567890',
-        current_day: 7,
-        days_remaining: 23,
-        intro_status: 'active',
-        created_at: '2024-07-18T00:00:00Z',
-        last_seen: '2024-07-20T19:00:00Z',
-        tags: 'Class Pass'
-      };
-      
-      // Add Trey at the beginning of Day 7
-      grouped[7].unshift(treyCustomer);
-
       setMessageSequences(sequences || []);
       setCustomersByDay(grouped);
     } catch (error) {
@@ -212,7 +193,7 @@ const IntroOffersSections = () => {
   }
 
   return (
-    <div className="flex-1 p-6 bg-background">
+    <div className="flex-1 p-6 bg-gradient-to-br from-background to-background/95">
       <div className="mb-6">
         <h1 className="text-2xl font-semibold text-foreground">Intro Offers - Nurture Sequence</h1>
         <p className="text-muted-foreground mt-2">
@@ -225,117 +206,112 @@ const IntroOffersSections = () => {
           const customers = customersByDay[sequence.day] || [];
           
           return (
-            <Card key={sequence.id} className="animate-fade-in border-2 shadow-lg bg-gradient-to-r from-card via-card to-muted/20">
-              <CardHeader className="pb-4 bg-gradient-to-r from-primary/5 to-secondary/5 border-b">
+            <Card key={sequence.id} className="animate-fade-in border-0 shadow-lg bg-gradient-to-br from-card via-card/95 to-card/90">
+              <CardHeader className="pb-4 bg-gradient-to-r from-primary/10 via-primary/8 to-primary/5 rounded-t-lg border-b border-border/40">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className="flex items-center gap-2">
-                      <div className="p-2 rounded-full bg-primary/10">
+                      <div className="p-2 rounded-full bg-primary/20 border border-primary/30">
                         {getMessageTypeIcon(sequence.message_type)}
                       </div>
-                      <CardTitle className="text-lg font-semibold">
+                      <CardTitle className="text-lg text-foreground">
                         Day {sequence.day} - {sequence.message_type === 'email' ? 'Email' : 'Text Message'}
                       </CardTitle>
                     </div>
                     {getMessageTypeBadge(sequence.message_type)}
                   </div>
-                  <Badge variant="secondary" className="bg-primary/10 text-primary font-semibold">
+                  <Badge variant="secondary" className="bg-primary/20 text-primary border-primary/30 shadow-sm">
                     {customers.length} customer{customers.length !== 1 ? 's' : ''}
                   </Badge>
                 </div>
                 
                 {sequence.subject && (
-                  <p className="text-sm text-muted-foreground font-medium">
+                  <p className="text-sm text-foreground/90 font-medium mt-2 bg-background/50 rounded px-3 py-1 border border-border/30">
                     Subject: {sequence.subject}
                   </p>
                 )}
                 
-                <p className="text-sm text-muted-foreground line-clamp-2">
+                <p className="text-sm text-muted-foreground line-clamp-2 mt-1 italic">
                   {sequence.content.substring(0, 150)}...
                 </p>
               </CardHeader>
 
-              <CardContent>
+              <CardContent className="p-6 bg-gradient-to-b from-background/30 to-background/50">
                 {customers.length === 0 ? (
-                  <div className="text-center py-8 text-muted-foreground">
+                  <div className="text-center py-12 text-muted-foreground bg-muted/20 rounded-lg border-2 border-dashed border-border/30">
                     No customers at this stage
                   </div>
                 ) : (
                   <div className="space-y-3">
-                     {customers.map((customer) => (
-                       <div 
-                         key={customer.id}
-                         className="flex items-center justify-between p-4 border-2 rounded-lg bg-gradient-to-r from-background to-muted/30 hover:from-primary/5 hover:to-secondary/5 transition-all duration-200 shadow-sm hover:shadow-md"
-                       >
+                    {customers.map((customer) => (
+                      <div 
+                        key={customer.id}
+                        className="flex items-center justify-between p-4 border border-border/60 rounded-lg hover:bg-accent/50 transition-all duration-200 hover:shadow-md bg-background/70 hover:border-primary/30"
+                      >
                         <div className="flex items-center gap-4">
-                           <div>
-                             <div className="font-semibold text-foreground">
-                               {customer.first_name} {customer.last_name}
-                             </div>
-                             <div className="text-sm text-muted-foreground font-medium">
-                               {customer.client_email}
-                             </div>
-                             {customer.first_name === 'Trey' && (
-                               <div className="text-xs text-primary font-medium mt-1">
-                                 Started July 18th • Class Pass
-                               </div>
-                             )}
-                           </div>
+                          <div>
+                            <div className="font-medium text-foreground">
+                              {customer.first_name} {customer.last_name}
+                            </div>
+                            <div className="text-sm text-muted-foreground">
+                              {customer.client_email}
+                            </div>
+                          </div>
                           
-                           <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                             <div className="flex items-center gap-1 bg-muted/50 px-2 py-1 rounded-full">
-                               <Calendar className="w-4 h-4 text-primary" />
-                               Started: {formatDate(customer.created_at)}
-                             </div>
-                             <div className="flex items-center gap-1 bg-muted/50 px-2 py-1 rounded-full">
-                               <Clock className="w-4 h-4 text-primary" />
-                               {customer.days_remaining} days left
-                             </div>
-                           </div>
+                          <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                            <div className="flex items-center gap-1 bg-accent/20 px-2 py-1 rounded">
+                              <Calendar className="w-4 h-4" />
+                              Started: {formatDate(customer.created_at)}
+                            </div>
+                            <div className="flex items-center gap-1 bg-accent/20 px-2 py-1 rounded">
+                              <Clock className="w-4 h-4" />
+                              {customer.days_remaining} days left
+                            </div>
+                          </div>
 
-                           {customer.tags && (
-                             <Badge variant="secondary" className="text-xs bg-primary/10 text-primary border-primary/20">
-                               {customer.tags}
-                             </Badge>
-                           )}
+                          {customer.tags && (
+                            <Badge variant="outline" className="text-xs bg-accent/30 text-accent-foreground border-accent/40">
+                              {customer.tags}
+                            </Badge>
+                          )}
                         </div>
 
-                         <div className="flex items-center gap-2">
-                           {/* Text Message Button */}
-                           <Button 
-                             variant="outline" 
-                             size="sm"
-                             className="hover:bg-primary/10 hover:border-primary/30 transition-colors"
-                             onClick={() => handleSendMessage(customer, 'text', sequence)}
-                             disabled={!customer.phone_number}
-                           >
-                             {sentMessages.has(`${customer.id}-text`) ? (
-                               <Check className="w-4 h-4 mr-1 text-green-600" />
-                             ) : (
-                               <Phone className="w-4 h-4 mr-1" />
-                             )}
-                             Text
-                           </Button>
-                           
-                           {/* Email Button */}
-                           <Button 
-                             variant="outline" 
-                             size="sm"
-                             className="hover:bg-primary/10 hover:border-primary/30 transition-colors"
-                             onClick={() => handleSendMessage(customer, 'email', sequence)}
-                           >
-                             {sentMessages.has(`${customer.id}-email`) ? (
-                               <Check className="w-4 h-4 mr-1 text-green-600" />
-                             ) : (
-                               <Mail className="w-4 h-4 mr-1" />
-                             )}
-                             Email
-                           </Button>
-                           
-                           <Button variant="ghost" size="sm" className="hover:bg-muted">
-                             <MoreHorizontal className="w-4 h-4" />
-                           </Button>
-                         </div>
+                        <div className="flex items-center gap-2">
+                          {/* Text Message Button */}
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => handleSendMessage(customer, 'text', sequence)}
+                            disabled={!customer.phone_number}
+                            className="border-primary/40 hover:bg-primary/10 hover:border-primary/60 shadow-sm"
+                          >
+                            {sentMessages.has(`${customer.id}-text`) ? (
+                              <Check className="w-4 h-4 mr-1 text-green-600" />
+                            ) : (
+                              <Phone className="w-4 h-4 mr-1" />
+                            )}
+                            Text
+                          </Button>
+                          
+                          {/* Email Button */}
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => handleSendMessage(customer, 'email', sequence)}
+                            className="border-primary/40 hover:bg-primary/10 hover:border-primary/60 shadow-sm"
+                          >
+                            {sentMessages.has(`${customer.id}-email`) ? (
+                              <Check className="w-4 h-4 mr-1 text-green-600" />
+                            ) : (
+                              <Mail className="w-4 h-4 mr-1" />
+                            )}
+                            Email
+                          </Button>
+                          
+                          <Button variant="ghost" size="sm" className="hover:bg-accent/30">
+                            <MoreHorizontal className="w-4 h-4" />
+                          </Button>
+                        </div>
                       </div>
                     ))}
                   </div>

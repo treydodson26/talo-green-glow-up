@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
@@ -44,6 +44,26 @@ const MessageModal = ({
   const [content, setContent] = useState(template?.content || '');
   const [sending, setSending] = useState(false);
 
+  // Reset form when template changes
+  useEffect(() => {
+    setSubject(template?.subject || '');
+    setContent(template?.content || '');
+  }, [template]);
+
+  // Handle escape key to close modal
+  useEffect(() => {
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && isOpen && !sending) {
+        onClose();
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('keydown', handleEscape);
+      return () => document.removeEventListener('keydown', handleEscape);
+    }
+  }, [isOpen, onClose, sending]);
+
   const handleSend = async () => {
     try {
       setSending(true);
@@ -85,30 +105,51 @@ const MessageModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto p-0">
+      <DialogContent 
+        className="sm:max-w-2xl max-h-[90vh] overflow-y-auto p-0 z-50" 
+        onEscapeKeyDown={onClose}
+        onInteractOutside={(e) => {
+          // Allow closing by clicking outside, but not when sending
+          if (!sending) {
+            onClose();
+          } else {
+            e.preventDefault();
+          }
+        }}
+      >
+        {/* Close Button */}
+        <Button
+          variant="ghost"
+          size="icon"
+          className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none z-10"
+          onClick={onClose}
+          disabled={sending}
+          aria-label="Close dialog"
+        >
+          <X className="h-4 w-4" />
+        </Button>
+
         {/* Header */}
-        <DialogHeader className="p-6 pb-4 border-b">
-          <div className="flex items-center justify-between">
-            <DialogTitle className="flex items-center gap-3 text-xl">
-              {messageType === 'email' ? (
-                <div className="flex items-center justify-center w-10 h-10 bg-blue-100 rounded-full">
-                  <Mail className="w-5 h-5 text-blue-600" />
-                </div>
-              ) : (
-                <div className="flex items-center justify-center w-10 h-10 bg-green-100 rounded-full">
-                  <Phone className="w-5 h-5 text-green-600" />
-                </div>
-              )}
-              <div>
-                <div className="font-semibold">
-                  Send {messageType === 'email' ? 'Email' : 'Text Message'}
-                </div>
-                <div className="text-sm font-normal text-muted-foreground">
-                  to {customer.first_name} {customer.last_name}
-                </div>
+        <DialogHeader className="p-6 pb-4 border-b pr-14">
+          <DialogTitle className="flex items-center gap-3 text-xl">
+            {messageType === 'email' ? (
+              <div className="flex items-center justify-center w-10 h-10 bg-blue-100 rounded-full">
+                <Mail className="w-5 h-5 text-blue-600" />
               </div>
-            </DialogTitle>
-          </div>
+            ) : (
+              <div className="flex items-center justify-center w-10 h-10 bg-green-100 rounded-full">
+                <Phone className="w-5 h-5 text-green-600" />
+              </div>
+            )}
+            <div>
+              <div className="font-semibold">
+                Send {messageType === 'email' ? 'Email' : 'Text Message'}
+              </div>
+              <div className="text-sm font-normal text-muted-foreground">
+                to {customer.first_name} {customer.last_name}
+              </div>
+            </div>
+          </DialogTitle>
           <DialogDescription className="sr-only">
             Compose and send a {messageType === 'email' ? 'email' : 'text message'} to {customer.first_name} {customer.last_name}
           </DialogDescription>

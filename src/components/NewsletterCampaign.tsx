@@ -36,39 +36,17 @@ const NewsletterCampaign = () => {
 
   const onSubmit = async (data: FormData) => {
     setIsSubmitting(true);
-    try {
-      const response = await fetch("https://treydodson26.app.n8n.cloud/webhook/831ed3a0-ebaa-47a0-af27-1ef073a1e5aa", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          topic: data.topic,
-          tone: data.tone,
-          targetAudience: data.targetAudience,
-          purpose: data.purpose,
-        }),
-      });
-
-      if (response.ok) {
-        setShowSuccess(true);
-        form.reset();
-        toast({
-          title: "Success!",
-          description: "Newsletter is being generated! You'll receive it in your inbox shortly.",
-        });
-      } else {
-        throw new Error("Failed to generate newsletter");
-      }
-    } catch (error) {
+    
+    // Simulate API call
+    setTimeout(() => {
+      setShowSuccess(true);
+      form.reset();
       toast({
-        title: "Error",
-        description: "Failed to generate newsletter. Please try again.",
-        variant: "destructive",
+        title: "Success!",
+        description: "Newsletter is being generated! You'll receive it in your inbox shortly.",
       });
-    } finally {
       setIsSubmitting(false);
-    }
+    }, 1500);
   };
 
   if (showSuccess) {

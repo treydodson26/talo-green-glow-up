@@ -41,58 +41,58 @@ const MarketingHub = () => {
       </div>
 
       {/* Overview Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-100 dark:bg-blue-900/20 rounded-lg">
-                <Send className="w-5 h-5 text-blue-600" />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <Card className="hover:shadow-md transition-shadow border-border/50">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div className="space-y-2">
+                <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Active Campaigns</p>
+                <p className="text-3xl font-bold text-foreground">{marketingStats.activeCampaigns}</p>
               </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Active Campaigns</p>
-                <p className="text-2xl font-semibold">{marketingStats.activeCampaigns}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-green-100 dark:bg-green-900/20 rounded-lg">
-                <FileImage className="w-5 h-5 text-green-600" />
-              </div>
-               <div>
-                 <p className="text-sm text-muted-foreground">Newsletters Sent</p>
-                 <p className="text-2xl font-semibold">8</p>
+              <div className="p-3 bg-primary/10 rounded-xl">
+                <Send className="w-6 h-6 text-primary" />
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-purple-100 dark:bg-purple-900/20 rounded-lg">
-                <Mail className="w-5 h-5 text-purple-600" />
+        <Card className="hover:shadow-md transition-shadow border-border/50">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div className="space-y-2">
+                <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Newsletters Sent</p>
+                <p className="text-3xl font-bold text-foreground">8</p>
               </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Emails Sent</p>
-                <p className="text-2xl font-semibold">{marketingStats.emailsSent}</p>
+              <div className="p-3 bg-accent/20 rounded-xl">
+                <FileImage className="w-6 h-6 text-accent-foreground" />
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-orange-100 dark:bg-orange-900/20 rounded-lg">
-                <BarChart3 className="w-5 h-5 text-orange-600" />
+        <Card className="hover:shadow-md transition-shadow border-border/50">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div className="space-y-2">
+                <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Emails Sent</p>
+                <p className="text-3xl font-bold text-foreground">{marketingStats.emailsSent.toLocaleString()}</p>
               </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Engagement Rate</p>
-                <p className="text-2xl font-semibold">{marketingStats.engagement}</p>
+              <div className="p-3 bg-secondary/30 rounded-xl">
+                <Mail className="w-6 h-6 text-secondary-foreground" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="hover:shadow-md transition-shadow border-border/50">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div className="space-y-2">
+                <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Engagement Rate</p>
+                <p className="text-3xl font-bold text-foreground">{marketingStats.engagement}</p>
+              </div>
+              <div className="p-3 bg-muted/50 rounded-xl">
+                <BarChart3 className="w-6 h-6 text-muted-foreground" />
               </div>
             </div>
           </CardContent>

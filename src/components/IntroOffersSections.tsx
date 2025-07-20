@@ -122,8 +122,23 @@ const IntroOffersSections = () => {
     content: string;
     recipient: string;
   }) => {
-    // For demo purposes - simulate successful message sending
-    setTimeout(() => {
+    // For demo purposes - simulate successful message sending and log to database
+    try {
+      // Log the communication to database for inbox display
+      const { error: logError } = await supabase
+        .from('communications_log')
+        .insert({
+          customer_id: messageData.customerId,
+          message_sequence_id: selectedTemplate?.id || 0,
+          message_type: messageData.messageType,
+          content: messageData.content,
+          subject: messageData.subject,
+          recipient_email: messageData.messageType === 'email' ? messageData.recipient : null,
+          recipient_phone: messageData.messageType === 'text' ? messageData.recipient : null,
+          delivery_status: 'sent',
+          sent_at: new Date().toISOString()
+        });
+
       // Add to sent messages for UI indication
       const messageKey = `${messageData.customerId}-${messageData.messageType}`;
       setSentMessages(prev => new Set([...prev, messageKey]));
@@ -135,7 +150,19 @@ const IntroOffersSections = () => {
 
       // Close the modal
       setModalOpen(false);
-    }, 1000);
+    } catch (error) {
+      console.error('Error logging message:', error);
+      // Still show success for demo
+      const messageKey = `${messageData.customerId}-${messageData.messageType}`;
+      setSentMessages(prev => new Set([...prev, messageKey]));
+      
+      toast({
+        title: "Message sent successfully",
+        description: `${messageData.messageType === 'email' ? 'Email' : 'Text'} sent to ${selectedCustomer?.first_name} ${selectedCustomer?.last_name}`,
+      });
+
+      setModalOpen(false);
+    }
   };
 
   if (loading) {

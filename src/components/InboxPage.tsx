@@ -185,7 +185,7 @@ const InboxPage = () => {
     const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.sent;
     
     return (
-      <Badge variant={config.variant} className={config.color}>
+      <Badge variant={config.variant} className="text-white">
         {status.charAt(0).toUpperCase() + status.slice(1)}
       </Badge>
     );

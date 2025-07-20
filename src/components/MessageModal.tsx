@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Mail, Phone, Send, Loader2, X } from "lucide-react";
 
@@ -109,6 +109,9 @@ const MessageModal = ({
               </div>
             </DialogTitle>
           </div>
+          <DialogDescription className="sr-only">
+            Compose and send a {messageType === 'email' ? 'email' : 'text message'} to {customer.first_name} {customer.last_name}
+          </DialogDescription>
         </DialogHeader>
 
         {/* Content */}

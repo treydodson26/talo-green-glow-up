@@ -23,7 +23,7 @@ import { useToast } from "@/hooks/use-toast";
 import IntroOffersSections from "@/components/IntroOffersSections";
 import WhatsAppMessaging from "@/components/WhatsAppMessaging";
 import AddCustomerDialog from "@/components/AddCustomerDialog";
-import IntroOfferDemo from "@/components/IntroOfferDemo";
+
 import MessageModal from "@/components/MessageModal";
 
 interface Customer {
@@ -568,12 +568,9 @@ const ClientsTable = () => {
             </div>
           )}
 
-          {/* Demo and Intro Offers Sections */}
+          {/* Intro Offers Sections */}
           {!loading && (
-            <div className="space-y-6">
-              <IntroOfferDemo />
-              <IntroOffersSections />
-            </div>
+            <IntroOffersSections />
           )}
         </TabsContent>
 

@@ -197,14 +197,14 @@ const IntroOffersSections = () => {
           
           return (
             <Card key={sequence.id} className="border shadow-sm">
-              <CardHeader className="pb-4 bg-green-50 border-b">
+              <CardHeader className="pb-4 bg-black text-white border-b">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className="flex items-center gap-2">
                       <div className="p-2 rounded-full bg-green-100 border border-green-200">
                         {getMessageTypeIcon(sequence.message_type)}
                       </div>
-                      <CardTitle className="text-lg text-gray-900">
+                      <CardTitle className="text-lg text-white">
                         Day {sequence.day} - {sequence.message_type === 'email' ? 'Email' : 'Text Message'}
                       </CardTitle>
                     </div>

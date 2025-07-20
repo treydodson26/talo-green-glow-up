@@ -101,7 +101,7 @@ const MarketingHub = () => {
 
       {/* Main Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-5 max-w-2xl mx-auto">
           <TabsTrigger value="flyers" className="flex items-center gap-2">
             <Image className="w-4 h-4" />
             Flyers

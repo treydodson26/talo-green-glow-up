@@ -44,13 +44,26 @@ const InboxPage = () => {
       .on(
         'postgres_changes',
         {
-          event: '*',
+          event: 'INSERT',
           schema: 'public',
           table: 'communications_log'
         },
         (payload) => {
-          console.log('Communication update:', payload);
-          loadCommunications(); // Reload data on any change
+          console.log('New communication received:', payload);
+          // Immediately reload data when new communication is added
+          loadCommunications();
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'communications_log'
+        },
+        (payload) => {
+          console.log('Communication updated:', payload);
+          loadCommunications();
         }
       )
       .subscribe();

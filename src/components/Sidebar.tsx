@@ -1,12 +1,12 @@
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 import { 
   Home, 
   Users, 
   Inbox, 
   Settings,
   BarChart3,
-  MessageSquare,
   UserPlus,
   GraduationCap,
   Cog,
@@ -19,15 +19,16 @@ interface SidebarProps {
 }
 
 const Sidebar = ({ activeRoute = "home", onRouteChange }: SidebarProps) => {
-  const navItems = [
+  const topNavItems = [
     { id: "home", icon: Home, label: "Home" },
     { id: "inbox", icon: Inbox, label: "Inbox" },
-    { id: "instructor-hub", icon: GraduationCap, label: "Instructor Hub" },
-    { id: "operations-hub", icon: Cog, label: "Operations Hub" },
+  ];
+
+  const bottomNavItems = [
+    { id: "customers", icon: UserPlus, label: "Customer Hub" },
     { id: "marketing-hub", icon: Megaphone, label: "Marketing Hub" },
-    { id: "customers", icon: UserPlus, label: "Customers" },
+    { id: "operations-hub", icon: Cog, label: "Operations Hub" },
     { id: "segments", icon: BarChart3, label: "Segments" },
-    { id: "comments", icon: MessageSquare, label: "Comments" },
     { id: "settings", icon: Settings, label: "Settings" },
   ];
 
@@ -46,7 +47,34 @@ const Sidebar = ({ activeRoute = "home", onRouteChange }: SidebarProps) => {
       {/* Navigation */}
       <nav className="flex-1 p-4">
         <div className="space-y-1">
-          {navItems.map((item) => {
+          {/* Top navigation items */}
+          {topNavItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = activeRoute === item.id;
+            
+            return (
+              <Button
+                key={item.id}
+                variant={isActive ? "default" : "ghost"}
+                className={cn(
+                  "w-full justify-start gap-3 text-sidebar-foreground hover:bg-sidebar-accent",
+                  isActive && "bg-primary text-primary-foreground hover:bg-primary/90"
+                )}
+                onClick={() => onRouteChange?.(item.id)}
+              >
+                <Icon className="h-4 w-4" />
+                {item.label}
+              </Button>
+            );
+          })}
+          
+          {/* Separator */}
+          <div className="py-2">
+            <Separator />
+          </div>
+          
+          {/* Bottom navigation items */}
+          {bottomNavItems.map((item) => {
             const Icon = item.icon;
             const isActive = activeRoute === item.id;
             

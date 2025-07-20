@@ -81,7 +81,7 @@ const NewsletterGenerator = () => {
 
     try {
       // Send data to n8n webhook
-      const webhookUrl = "https://mvanish-assistant.app.n8n.cloud/webhook/831ed3a0-ebaa-47a0-af27-1ef073a1e5aa";
+      const webhookUrl = "https://treydodson26.app.n8n.cloud/webhook-test/831ed3a0-ebaa-47a0-af27-1ef073a1e5aa";
       
       const response = await fetch(webhookUrl, {
         method: "POST",

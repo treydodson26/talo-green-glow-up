@@ -70,8 +70,8 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log('Sending WhatsApp message to:', formattedPhone);
 
-    // Call WhatsApp Business API
-    const whatsappResponse = await fetch(`https://graph.facebook.com/v18.0/${phoneNumberId}/messages`, {
+    // Call WhatsApp Business API with template
+    const whatsappResponse = await fetch(`https://graph.facebook.com/v19.0/${phoneNumberId}/messages`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${accessToken}`,
@@ -80,9 +80,27 @@ const handler = async (req: Request): Promise<Response> => {
       body: JSON.stringify({
         messaging_product: 'whatsapp',
         to: formattedPhone,
-        type: 'text',
-        text: {
-          body: message_content
+        type: 'template',
+        template: {
+          name: 'intro_offer_greeting',
+          language: {
+            code: 'en_US'
+          },
+          components: [
+            {
+              type: 'body',
+              parameters: [
+                {
+                  type: 'text',
+                  text: customer.first_name
+                },
+                {
+                  type: 'text', 
+                  text: 'Intro Offer'
+                }
+              ]
+            }
+          ]
         }
       })
     });

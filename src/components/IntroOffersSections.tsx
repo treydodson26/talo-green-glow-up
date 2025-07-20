@@ -129,7 +129,7 @@ const IntroOffersSections = () => {
         .from('communications_log')
         .insert({
           customer_id: messageData.customerId,
-          message_sequence_id: selectedTemplate?.id || 0,
+          message_sequence_id: messageData.messageType === 'email' ? 0 : 999, // Use appropriate manual sequence ID
           message_type: messageData.messageType,
           content: messageData.content,
           subject: messageData.subject,

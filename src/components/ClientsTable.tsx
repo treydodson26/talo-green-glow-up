@@ -245,7 +245,7 @@ const ClientsTable = () => {
         .from('communications_log')
         .insert({
           customer_id: messageData.customerId,
-          message_sequence_id: 0, // Use 0 for manual messages
+          message_sequence_id: messageData.messageType === 'email' ? 0 : 999, // Use appropriate manual sequence ID
           message_type: messageData.messageType,
           subject: messageData.subject,
           content: messageData.content,

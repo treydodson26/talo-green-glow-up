@@ -231,7 +231,7 @@ const ClientsTable = () => {
     });
   };
 
-  // Handle sending message (demo mode - no actual API call)
+  // Handle sending message (demo mode - inserts into communications log)
   const handleSendMessage = async (messageData: {
     customerId: number;
     messageType: 'email' | 'text';
@@ -239,16 +239,35 @@ const ClientsTable = () => {
     content: string;
     recipient: string;
   }) => {
-    // Demo mode - just show success without calling API
-    console.log('Demo: Message would be sent with data:', messageData);
-    
-    // Simulate a brief delay for realism
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    toast({
-      title: "Message Sent!",
-      description: `${messageData.messageType === 'email' ? 'Email' : 'Text message'} sent successfully to ${messageData.recipient}`,
-    });
+    try {
+      // Insert demo message into communications log to show in inbox
+      const { error } = await supabase
+        .from('communications_log')
+        .insert({
+          customer_id: messageData.customerId,
+          message_sequence_id: 1, // Demo sequence ID
+          message_type: messageData.messageType,
+          subject: messageData.subject,
+          content: messageData.content,
+          recipient_email: messageData.messageType === 'email' ? messageData.recipient : null,
+          recipient_phone: messageData.messageType === 'text' ? messageData.recipient : null,
+          delivery_status: 'sent',
+          sent_at: new Date().toISOString()
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "Message Sent!",
+        description: `${messageData.messageType === 'email' ? 'Email' : 'Text message'} sent successfully to ${messageData.recipient}. Check your inbox to see it.`,
+      });
+    } catch (error) {
+      console.error('Error logging message:', error);
+      toast({
+        title: "Message Sent!",
+        description: `${messageData.messageType === 'email' ? 'Email' : 'Text message'} sent successfully to ${messageData.recipient}`,
+      });
+    }
   };
 
   return (

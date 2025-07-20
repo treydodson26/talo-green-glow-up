@@ -49,9 +49,53 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log('Found customer:', customer.first_name, customer.last_name);
 
-    // Simulate WhatsApp API call (replace with actual WhatsApp Business API)
-    console.log('Simulating WhatsApp message send...');
-    const mockWhatsAppMessageId = `whatsapp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    // Send WhatsApp message using Meta Business API
+    const accessToken = Deno.env.get('WHATSAPP_ACCESS_TOKEN');
+    const phoneNumberId = '726939160498891'; // Your WhatsApp Business phone number ID
+    
+    if (!accessToken) {
+      throw new Error('WhatsApp access token not configured');
+    }
+
+    // Format phone number (remove any non-digit characters and ensure it has country code)
+    let formattedPhone = customer.phone_number?.replace(/\D/g, '') || '';
+    if (!formattedPhone) {
+      throw new Error('Customer phone number is required');
+    }
+    
+    // Add country code if not present (assuming US numbers for now)
+    if (!formattedPhone.startsWith('1') && formattedPhone.length === 10) {
+      formattedPhone = '1' + formattedPhone;
+    }
+
+    console.log('Sending WhatsApp message to:', formattedPhone);
+
+    // Call WhatsApp Business API
+    const whatsappResponse = await fetch(`https://graph.facebook.com/v18.0/${phoneNumberId}/messages`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        messaging_product: 'whatsapp',
+        to: formattedPhone,
+        type: 'text',
+        text: {
+          body: message_content
+        }
+      })
+    });
+
+    const whatsappData = await whatsappResponse.json();
+
+    if (!whatsappResponse.ok) {
+      console.error('WhatsApp API error:', whatsappData);
+      throw new Error(`WhatsApp API error: ${whatsappData.error?.message || 'Unknown error'}`);
+    }
+
+    console.log('WhatsApp message sent successfully:', whatsappData);
+    const whatsAppMessageId = whatsappData.messages?.[0]?.id || `fallback_${Date.now()}`;
     
     // Log the communication in the database
     const { data: logData, error: logError } = await supabase
@@ -64,7 +108,7 @@ const handler = async (req: Request): Promise<Response> => {
           message_type: 'whatsapp',
           recipient_phone: customer.phone_number,
           delivery_status: 'sent',
-          whatsapp_message_id: mockWhatsAppMessageId,
+          whatsapp_message_id: whatsAppMessageId,
           sent_at: new Date().toISOString()
         }
       ])
@@ -81,7 +125,7 @@ const handler = async (req: Request): Promise<Response> => {
     return new Response(JSON.stringify({
       success: true,
       message: `WhatsApp message sent to ${customer.first_name} ${customer.last_name}`,
-      whatsapp_message_id: mockWhatsAppMessageId,
+      whatsapp_message_id: whatsAppMessageId,
       log_id: logData.id
     }), {
       status: 200,

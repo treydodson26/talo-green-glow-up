@@ -16,7 +16,6 @@ import {
 import FlyerGenerator from "@/components/FlyerGenerator";
 import CampaignManager from "@/components/CampaignManager";
 import CustomerSegments from "@/components/CustomerSegments";
-import WhatsAppMessaging from "@/components/WhatsAppMessaging";
 
 const MarketingHub = () => {
   const [activeTab, setActiveTab] = useState("flyers");
@@ -100,7 +99,7 @@ const MarketingHub = () => {
 
       {/* Main Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="flyers" className="flex items-center gap-2">
             <Image className="w-4 h-4" />
             Flyer Generator
@@ -108,10 +107,6 @@ const MarketingHub = () => {
           <TabsTrigger value="campaigns" className="flex items-center gap-2">
             <Send className="w-4 h-4" />
             Campaigns
-          </TabsTrigger>
-          <TabsTrigger value="whatsapp" className="flex items-center gap-2">
-            <Send className="w-4 h-4" />
-            WhatsApp
           </TabsTrigger>
           <TabsTrigger value="segments" className="flex items-center gap-2">
             <Target className="w-4 h-4" />
@@ -129,10 +124,6 @@ const MarketingHub = () => {
 
         <TabsContent value="campaigns" className="space-y-4">
           <CampaignManager />
-        </TabsContent>
-
-        <TabsContent value="whatsapp" className="space-y-4">
-          <WhatsAppMessaging />
         </TabsContent>
 
         <TabsContent value="segments" className="space-y-4">

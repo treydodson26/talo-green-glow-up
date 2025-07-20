@@ -16,10 +16,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Search, Filter, MoreHorizontal, Plus, ChevronDown, Phone, Mail, Loader2 } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Search, Filter, MoreHorizontal, Plus, ChevronDown, Phone, Mail, Loader2, MessageSquare } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import IntroOffersSections from "@/components/IntroOffersSections";
+import WhatsAppMessaging from "@/components/WhatsAppMessaging";
 
 interface Customer {
   id: number;
@@ -44,6 +46,7 @@ const ClientsTable = () => {
   const [totalCustomerCount, setTotalCustomerCount] = useState(0);
   const [totalIntroOfferCount, setTotalIntroOfferCount] = useState(0);
   const [showAllIntroOffers, setShowAllIntroOffers] = useState(false);
+  const [activeTab, setActiveTab] = useState("clients"); // Add tab state
   const { toast } = useToast();
 
   const filters = [
@@ -199,9 +202,9 @@ const ClientsTable = () => {
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-2xl font-semibold text-foreground mb-2">Clients</h1>
+          <h1 className="text-2xl font-semibold text-foreground mb-2">Customers Hub</h1>
           <p className="text-muted-foreground">
-            Client information may be delayed by up to one hour when using segments
+            Manage customers, intro offers, and communications
           </p>
         </div>
         <div className="flex gap-2">
@@ -245,225 +248,258 @@ const ClientsTable = () => {
         </div>
       </div>
 
-      {/* Filter Tabs */}
-      <div className="flex gap-4 mb-6 overflow-x-auto">
-        {filters.map((filter) => (
-          <Button
-            key={filter}
-            variant={activeFilter === filter ? "default" : "ghost"}
-            className={`whitespace-nowrap ${
-              activeFilter === filter 
-                ? "bg-primary text-primary-foreground" 
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-            onClick={() => setActiveFilter(filter)}
-          >
-            {filter}
-          </Button>
-        ))}
-      </div>
+      {/* Tabs */}
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="clients" className="flex items-center gap-2">
+            <Plus className="w-4 h-4" />
+            All Clients
+          </TabsTrigger>
+          <TabsTrigger value="intro-offers" className="flex items-center gap-2">
+            <Plus className="w-4 h-4" />
+            Intro Offers
+          </TabsTrigger>
+          <TabsTrigger value="whatsapp" className="flex items-center gap-2">
+            <MessageSquare className="w-4 h-4" />
+            WhatsApp
+          </TabsTrigger>
+        </TabsList>
 
-      {/* Search and Filter */}
-      <div className="flex gap-4 mb-6">
-        <div className="relative flex-1 max-w-sm">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search all clients"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10"
-          />
-        </div>
-        <Button 
-          variant="outline" 
-          size="icon"
-          onClick={() => {
-            toast({
-              title: "Filter Options",
-              description: "Advanced filter options will be implemented soon.",
-            });
-          }}
-        >
-          <Filter className="h-4 w-4" />
-        </Button>
-      </div>
-
-      {/* Intro Offer Summary - Only show when viewing Intro Offer filter */}
-      {activeFilter === "Intro Offer" && totalIntroOfferCount > 0 && !loading && (
-        <div className="bg-muted/50 rounded-lg p-4 mb-6 border">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="font-semibold text-foreground">Intro Offer Period Customers</h3>
-              <p className="text-muted-foreground mt-1">
-                Showing {showAllIntroOffers ? filteredCustomers.length : Math.min(10, filteredCustomers.length)} of {totalIntroOfferCount} customers 
-                who started their intro offer within the last 30 days
-              </p>
-            </div>
-            {totalIntroOfferCount > 10 && (
+        <TabsContent value="clients" className="space-y-4">
+          {/* Filter Tabs */}
+          <div className="flex gap-4 mb-6 overflow-x-auto">
+            {filters.map((filter) => (
               <Button
-                variant={showAllIntroOffers ? "secondary" : "outline"}
-                onClick={() => setShowAllIntroOffers(!showAllIntroOffers)}
-                className="ml-4"
+                key={filter}
+                variant={activeFilter === filter ? "default" : "ghost"}
+                className={`whitespace-nowrap ${
+                  activeFilter === filter 
+                    ? "bg-primary text-primary-foreground" 
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+                onClick={() => setActiveFilter(filter)}
               >
-                {showAllIntroOffers ? `Show Recent 10` : `View All ${totalIntroOfferCount}`}
+                {filter}
               </Button>
-            )}
+            ))}
           </div>
-          {totalIntroOfferCount > 10 && !showAllIntroOffers && (
-            <div className="mt-3 text-sm text-muted-foreground">
-              <Badge variant="outline" className="mr-2">
-                {totalIntroOfferCount - 10} more customers available
-              </Badge>
-              Click "View All" to see the complete list
+
+          {/* Search and Filter */}
+          <div className="flex gap-4 mb-6">
+            <div className="relative flex-1 max-w-sm">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search all clients"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            <Button 
+              variant="outline" 
+              size="icon"
+              onClick={() => {
+                toast({
+                  title: "Filter Options",
+                  description: "Advanced filter options will be implemented soon.",
+                });
+              }}
+            >
+              <Filter className="h-4 w-4" />
+            </Button>
+          </div>
+
+          {/* All Customers Summary - Only show when viewing All filter */}
+          {activeFilter === "All" && totalCustomerCount > 0 && !loading && (
+            <div className="bg-muted/50 rounded-lg p-4 mb-6 border">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="font-semibold text-foreground">All Customers</h3>
+                  <p className="text-muted-foreground mt-1">
+                    Total of {totalCustomerCount} customers in the database
+                    {searchTerm && ` (showing ${filteredCustomers.length} matching "${searchTerm}")`}
+                  </p>
+                </div>
+                <Badge variant="secondary" className="text-lg px-3 py-1">
+                  {totalCustomerCount.toLocaleString()}
+                </Badge>
+              </div>
             </div>
           )}
-        </div>
-      )}
 
-      {/* All Customers Summary - Only show when viewing All filter */}
-      {activeFilter === "All" && totalCustomerCount > 0 && !loading && (
-        <div className="bg-muted/50 rounded-lg p-4 mb-6 border">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="font-semibold text-foreground">All Customers</h3>
-              <p className="text-muted-foreground mt-1">
-                Total of {totalCustomerCount} customers in the database
-                {searchTerm && ` (showing ${filteredCustomers.length} matching "${searchTerm}")`}
-              </p>
+          {/* Loading State */}
+          {loading && (
+            <div className="flex justify-center items-center py-8">
+              <Loader2 className="h-6 w-6 animate-spin" />
+              <span className="ml-2 text-muted-foreground">Loading customers...</span>
             </div>
-            <Badge variant="secondary" className="text-lg px-3 py-1">
-              {totalCustomerCount.toLocaleString()}
-            </Badge>
-          </div>
-        </div>
-      )}
-      {/* Loading State */}
-      {loading && (
-        <div className="flex justify-center items-center py-8">
-          <Loader2 className="h-6 w-6 animate-spin" />
-          <span className="ml-2 text-muted-foreground">Loading customers...</span>
-        </div>
-      )}
+          )}
 
-      {/* Intro Offers Sections - Show when Intro Offer filter is active */}
-      {!loading && activeFilter === "Intro Offer" && (
-        <IntroOffersSections />
-      )}
-
-      {/* Table - Show for all other filters */}
-      {!loading && activeFilter !== "Intro Offer" && (
-        <div className="bg-card rounded-lg border shadow-soft">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-[200px]">NAME</TableHead>
-                <TableHead>EMAIL</TableHead>
-                <TableHead>PHONE</TableHead>
-                <TableHead>TAGS</TableHead>
-                <TableHead>CREATED</TableHead>
-                <TableHead>LAST SEEN</TableHead>
-                <TableHead className="text-right">ACTIONS</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredCustomers.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
-                    {searchTerm ? 'No customers found matching your search.' : 'No customers found.'}
-                  </TableCell>
-                </TableRow>
-              ) : (
-                filteredCustomers.map((customer) => (
-                  <TableRow key={customer.id}>
-                    <TableCell className="font-medium">
-                      {customer.first_name} {customer.last_name}
-                    </TableCell>
-                    <TableCell className="text-muted-foreground">{customer.client_email}</TableCell>
-                    <TableCell className="text-muted-foreground">
-                      {customer.phone_number || '--'}
-                    </TableCell>
-                    <TableCell>
-                      {customer.tags ? (
-                        customer.tags.split(',').map((tag, index) => (
-                          <Badge key={index} variant="secondary" className="mr-1 mb-1">
-                            {tag.trim()}
-                          </Badge>
-                        ))
-                      ) : null}
-                    </TableCell>
-                    <TableCell className="text-muted-foreground">
-                      {formatDate(customer.created_at)}
-                    </TableCell>
-                    <TableCell className="text-muted-foreground">
-                      {formatDate(customer.last_seen || '')}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-2">
-                        {customer.phone_number && (
-                          <Button 
-                            variant="ghost" 
-                            size="icon" 
-                            title="Call customer"
-                            onClick={() => {
-                              window.open(`tel:${customer.phone_number}`, '_self');
-                            }}
-                          >
-                            <Phone className="h-4 w-4" />
-                          </Button>
-                        )}
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          title="Email customer"
-                          onClick={() => {
-                            window.open(`mailto:${customer.client_email}`, '_self');
-                          }}
-                        >
-                          <Mail className="h-4 w-4" />
-                        </Button>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon">
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => {
-                              toast({
-                                title: "Customer Details",
-                                description: `Viewing details for ${customer.first_name} ${customer.last_name}`,
-                              });
-                            }}>
-                              View Details
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => {
-                              toast({
-                                title: "Edit Customer",
-                                description: `Edit functionality for ${customer.first_name} ${customer.last_name} will be implemented soon.`,
-                              });
-                            }}>
-                              Edit
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => {
-                              toast({
-                                title: "Delete Customer",
-                                description: `Delete functionality will be implemented soon.`,
-                                variant: "destructive",
-                              });
-                            }}>
-                              Delete
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </div>
-                    </TableCell>
+          {/* Table - Show for all filters except Intro Offer */}
+          {!loading && activeFilter !== "Intro Offer" && (
+            <div className="bg-card rounded-lg border shadow-soft">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-[200px]">NAME</TableHead>
+                    <TableHead>EMAIL</TableHead>
+                    <TableHead>PHONE</TableHead>
+                    <TableHead>TAGS</TableHead>
+                    <TableHead>CREATED</TableHead>
+                    <TableHead>LAST SEEN</TableHead>
+                    <TableHead className="text-right">ACTIONS</TableHead>
                   </TableRow>
-                ))
+                </TableHeader>
+                <TableBody>
+                  {filteredCustomers.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                        {searchTerm ? 'No customers found matching your search.' : 'No customers found.'}
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    filteredCustomers.map((customer) => (
+                      <TableRow key={customer.id}>
+                        <TableCell className="font-medium">
+                          {customer.first_name} {customer.last_name}
+                        </TableCell>
+                        <TableCell className="text-muted-foreground">{customer.client_email}</TableCell>
+                        <TableCell className="text-muted-foreground">
+                          {customer.phone_number || '--'}
+                        </TableCell>
+                        <TableCell>
+                          {customer.tags ? (
+                            customer.tags.split(',').map((tag, index) => (
+                              <Badge key={index} variant="secondary" className="mr-1 mb-1">
+                                {tag.trim()}
+                              </Badge>
+                            ))
+                          ) : null}
+                        </TableCell>
+                        <TableCell className="text-muted-foreground">
+                          {formatDate(customer.created_at)}
+                        </TableCell>
+                        <TableCell className="text-muted-foreground">
+                          {formatDate(customer.last_seen || '')}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex justify-end gap-2">
+                            {customer.phone_number && (
+                              <Button 
+                                variant="ghost" 
+                                size="icon" 
+                                title="Call customer"
+                                onClick={() => {
+                                  window.open(`tel:${customer.phone_number}`, '_self');
+                                }}
+                              >
+                                <Phone className="h-4 w-4" />
+                              </Button>
+                            )}
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              title="Email customer"
+                              onClick={() => {
+                                window.open(`mailto:${customer.client_email}`, '_self');
+                              }}
+                            >
+                              <Mail className="h-4 w-4" />
+                            </Button>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="icon">
+                                  <MoreHorizontal className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem onClick={() => {
+                                  toast({
+                                    title: "Customer Details",
+                                    description: `Viewing details for ${customer.first_name} ${customer.last_name}`,
+                                  });
+                                }}>
+                                  View Details
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => {
+                                  toast({
+                                    title: "Edit Customer",
+                                    description: `Edit functionality for ${customer.first_name} ${customer.last_name} will be implemented soon.`,
+                                  });
+                                }}>
+                                  Edit
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => {
+                                  toast({
+                                    title: "Delete Customer",
+                                    description: `Delete functionality will be implemented soon.`,
+                                    variant: "destructive",
+                                  });
+                                }}>
+                                  Delete
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+        </TabsContent>
+
+        <TabsContent value="intro-offers" className="space-y-4">
+          {/* Intro Offer Summary */}
+          {totalIntroOfferCount > 0 && !loading && (
+            <div className="bg-muted/50 rounded-lg p-4 mb-6 border">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="font-semibold text-foreground">Intro Offer Period Customers</h3>
+                  <p className="text-muted-foreground mt-1">
+                    Showing {showAllIntroOffers ? filteredCustomers.length : Math.min(10, filteredCustomers.length)} of {totalIntroOfferCount} customers 
+                    who started their intro offer within the last 30 days
+                  </p>
+                </div>
+                {totalIntroOfferCount > 10 && (
+                  <Button
+                    variant={showAllIntroOffers ? "secondary" : "outline"}
+                    onClick={() => setShowAllIntroOffers(!showAllIntroOffers)}
+                    className="ml-4"
+                  >
+                    {showAllIntroOffers ? `Show Recent 10` : `View All ${totalIntroOfferCount}`}
+                  </Button>
+                )}
+              </div>
+              {totalIntroOfferCount > 10 && !showAllIntroOffers && (
+                <div className="mt-3 text-sm text-muted-foreground">
+                  <Badge variant="outline" className="mr-2">
+                    {totalIntroOfferCount - 10} more customers available
+                  </Badge>
+                  Click "View All" to see the complete list
+                </div>
               )}
-            </TableBody>
-          </Table>
-        </div>
-      )}
+            </div>
+          )}
+
+          {/* Loading State */}
+          {loading && (
+            <div className="flex justify-center items-center py-8">
+              <Loader2 className="h-6 w-6 animate-spin" />
+              <span className="ml-2 text-muted-foreground">Loading intro offers...</span>
+            </div>
+          )}
+
+          {/* Intro Offers Sections */}
+          {!loading && <IntroOffersSections />}
+        </TabsContent>
+
+        <TabsContent value="whatsapp" className="space-y-4">
+          <WhatsAppMessaging />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };

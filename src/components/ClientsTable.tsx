@@ -17,7 +17,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Search, Filter, MoreHorizontal, Plus, ChevronDown, Phone, Mail, Loader2, MessageSquare } from "lucide-react";
+import { Search, Filter, MoreHorizontal, Plus, ChevronDown, Phone, Mail, Loader2, MessageSquare, MessageCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import IntroOffersSections from "@/components/IntroOffersSections";
@@ -397,6 +397,50 @@ const ClientsTable = () => {
                                 }}
                               >
                                 <Phone className="h-4 w-4" />
+                              </Button>
+                            )}
+                            {customer.phone_number && (
+                              <Button 
+                                variant="ghost" 
+                                size="icon" 
+                                title="Send WhatsApp message"
+                                onClick={async () => {
+                                  try {
+                                    console.log(`Sending WhatsApp message to ${customer.first_name} ${customer.last_name}...`);
+                                    
+                                    const { data, error } = await supabase.functions.invoke('send-whatsapp-message', {
+                                      body: {
+                                        customer_id: customer.id,
+                                        message_content: `Hi ${customer.first_name}! 👋 It's been a week since you joined Tallow Yoga. How are you feeling after your first classes? We'd love to hear about your experience so far! 💚`,
+                                        message_type: 'day_7_followup'
+                                      }
+                                    });
+
+                                    if (error) {
+                                      console.error('Error sending WhatsApp message:', error);
+                                      toast({
+                                        title: "Error",
+                                        description: "Failed to send WhatsApp message. Please try again.",
+                                        variant: "destructive",
+                                      });
+                                    } else {
+                                      console.log('WhatsApp message sent successfully:', data);
+                                      toast({
+                                        title: "Message Sent",
+                                        description: `WhatsApp message sent to ${customer.first_name} ${customer.last_name}`,
+                                      });
+                                    }
+                                  } catch (error) {
+                                    console.error('Failed to send WhatsApp message:', error);
+                                    toast({
+                                      title: "Error",
+                                      description: "Failed to send WhatsApp message. Please try again.",
+                                      variant: "destructive",
+                                    });
+                                  }
+                                }}
+                              >
+                                <MessageCircle className="h-4 w-4" />
                               </Button>
                             )}
                             <Button 

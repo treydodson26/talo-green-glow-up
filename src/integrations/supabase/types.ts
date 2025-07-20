@@ -14,6 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
+      classes_schedule: {
+        Row: {
+          class_date: string
+          class_name: string
+          class_time: string
+          created_at: string | null
+          current_bookings: number | null
+          id: string
+          instructor_name: string
+          max_capacity: number | null
+          needs_substitute: boolean | null
+          room: string | null
+          waitlist_count: number | null
+        }
+        Insert: {
+          class_date: string
+          class_name: string
+          class_time: string
+          created_at?: string | null
+          current_bookings?: number | null
+          id?: string
+          instructor_name: string
+          max_capacity?: number | null
+          needs_substitute?: boolean | null
+          room?: string | null
+          waitlist_count?: number | null
+        }
+        Update: {
+          class_date?: string
+          class_name?: string
+          class_time?: string
+          created_at?: string | null
+          current_bookings?: number | null
+          id?: string
+          instructor_name?: string
+          max_capacity?: number | null
+          needs_substitute?: boolean | null
+          room?: string | null
+          waitlist_count?: number | null
+        }
+        Relationships: []
+      }
       communications_log: {
         Row: {
           content: string
@@ -148,17 +190,27 @@ export type Database = {
           birthday: string | null
           client_email: string
           client_name: string
+          conversion_date: string | null
           created_at: string | null
+          customer_segment: string | null
+          first_class_date: string | null
           first_name: string
           first_seen: string | null
           id: number
+          intro_end_date: string | null
+          intro_start_date: string | null
+          last_class_date: string | null
           last_name: string
           last_seen: string | null
           marketing_email_opt_in: boolean | null
           marketing_text_opt_in: boolean | null
+          notes: string | null
           phone_number: string | null
           pre_arketa_milestone_count: number | null
+          source: string | null
+          status: string | null
           tags: string | null
+          total_lifetime_value: number | null
           transactional_text_opt_in: boolean | null
           updated_at: string | null
         }
@@ -168,17 +220,27 @@ export type Database = {
           birthday?: string | null
           client_email: string
           client_name: string
+          conversion_date?: string | null
           created_at?: string | null
+          customer_segment?: string | null
+          first_class_date?: string | null
           first_name: string
           first_seen?: string | null
           id?: number
+          intro_end_date?: string | null
+          intro_start_date?: string | null
+          last_class_date?: string | null
           last_name: string
           last_seen?: string | null
           marketing_email_opt_in?: boolean | null
           marketing_text_opt_in?: boolean | null
+          notes?: string | null
           phone_number?: string | null
           pre_arketa_milestone_count?: number | null
+          source?: string | null
+          status?: string | null
           tags?: string | null
+          total_lifetime_value?: number | null
           transactional_text_opt_in?: boolean | null
           updated_at?: string | null
         }
@@ -188,18 +250,76 @@ export type Database = {
           birthday?: string | null
           client_email?: string
           client_name?: string
+          conversion_date?: string | null
           created_at?: string | null
+          customer_segment?: string | null
+          first_class_date?: string | null
           first_name?: string
           first_seen?: string | null
           id?: number
+          intro_end_date?: string | null
+          intro_start_date?: string | null
+          last_class_date?: string | null
           last_name?: string
           last_seen?: string | null
           marketing_email_opt_in?: boolean | null
           marketing_text_opt_in?: boolean | null
+          notes?: string | null
           phone_number?: string | null
           pre_arketa_milestone_count?: number | null
+          source?: string | null
+          status?: string | null
           tags?: string | null
+          total_lifetime_value?: number | null
           transactional_text_opt_in?: boolean | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      leads: {
+        Row: {
+          assigned_to: string | null
+          created_at: string | null
+          email: string
+          first_name: string
+          follow_up_count: number | null
+          id: string
+          last_contact_date: string | null
+          last_name: string
+          notes: string | null
+          phone: string | null
+          source: string | null
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          assigned_to?: string | null
+          created_at?: string | null
+          email: string
+          first_name: string
+          follow_up_count?: number | null
+          id?: string
+          last_contact_date?: string | null
+          last_name: string
+          notes?: string | null
+          phone?: string | null
+          source?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          assigned_to?: string | null
+          created_at?: string | null
+          email?: string
+          first_name?: string
+          follow_up_count?: number | null
+          id?: string
+          last_contact_date?: string | null
+          last_name?: string
+          notes?: string | null
+          phone?: string | null
+          source?: string | null
+          status?: string | null
           updated_at?: string | null
         }
         Relationships: []
@@ -244,6 +364,19 @@ export type Database = {
           customer_count: number | null
           customers: Json | null
           stage: string | null
+        }
+        Relationships: []
+      }
+      dashboard_metrics: {
+        Row: {
+          active_intro_offers: number | null
+          avg_capacity_today: number | null
+          ending_this_week: number | null
+          new_leads_week: number | null
+          revenue_last_month: number | null
+          revenue_this_month: number | null
+          todays_classes: number | null
+          waitlisted_classes: number | null
         }
         Relationships: []
       }

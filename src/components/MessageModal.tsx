@@ -156,99 +156,171 @@ const MessageModal = ({
         </DialogHeader>
 
         {/* Content */}
-        <div className="p-6 space-y-6">
-          {/* Recipient Info */}
-          <div className="bg-muted/50 p-4 rounded-lg border">
+        <div className="p-6 space-y-8">
+          {/* Recipient Info Section */}
+          <div className="bg-gradient-to-r from-blue-50 to-green-50 p-5 rounded-xl border border-blue-100/50">
             <div className="flex items-center justify-between">
-              <div className="space-y-1">
-                <p className="font-medium text-sm">Recipient</p>
-                <p className="text-sm text-muted-foreground">
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <div className="text-sm font-medium text-slate-600 uppercase tracking-wide">
+                    {messageType === 'email' ? 'Email Recipient' : 'SMS Recipient'}
+                  </div>
+                  <Badge variant={messageType === 'email' ? 'default' : 'secondary'} className="text-xs">
+                    {messageType === 'email' ? 'Email' : 'SMS'}
+                  </Badge>
+                </div>
+                <div className="text-lg font-semibold text-slate-800">
+                  {customer.first_name} {customer.last_name}
+                </div>
+                <div className="text-sm text-slate-600 font-mono bg-white/60 px-3 py-1 rounded-md border">
                   {messageType === 'email' ? customer.client_email : customer.phone_number}
-                </p>
+                </div>
               </div>
-              <Badge variant={messageType === 'email' ? 'default' : 'secondary'} className="ml-4">
-                {messageType === 'email' ? 'Email' : 'SMS'}
-              </Badge>
+              <div className={`p-3 rounded-full ${messageType === 'email' ? 'bg-blue-100' : 'bg-green-100'}`}>
+                {messageType === 'email' ? (
+                  <Mail className="w-6 h-6 text-blue-600" />
+                ) : (
+                  <Phone className="w-6 h-6 text-green-600" />
+                )}
+              </div>
             </div>
           </div>
 
-          {/* Subject (Email only) */}
+          {/* Subject Section (Email only) */}
           {messageType === 'email' && (
-            <div className="space-y-3">
-              <Label htmlFor="subject" className="text-sm font-medium">Subject Line</Label>
+            <div className="space-y-4">
+              <div className="border-l-4 border-blue-500 pl-4">
+                <Label htmlFor="subject" className="text-base font-semibold text-slate-800">
+                  Email Subject Line
+                </Label>
+                <p className="text-sm text-slate-600 mt-1">
+                  Create a compelling subject that encourages opens
+                </p>
+              </div>
               <Input
                 id="subject"
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
-                placeholder="Enter email subject..."
-                className="w-full"
+                placeholder="Enter your email subject line..."
+                className="text-base py-3 px-4 border-2 focus:border-blue-500 transition-colors"
               />
               {previewSubject && previewSubject !== subject && (
-                <div className="p-3 bg-blue-50 rounded-md border border-blue-200">
-                  <p className="text-xs font-medium text-blue-700 mb-1">Preview:</p>
-                  <p className="text-sm text-blue-800">{previewSubject}</p>
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                    <p className="text-xs font-semibold text-blue-700 uppercase tracking-wide">
+                      Subject Preview
+                    </p>
+                  </div>
+                  <p className="text-base font-medium text-blue-900">{previewSubject}</p>
                 </div>
               )}
             </div>
           )}
 
-          {/* Message Content */}
-          <div className="space-y-3">
-            <Label htmlFor="content" className="text-sm font-medium">
-              Message Content
-            </Label>
+          {/* Message Content Section */}
+          <div className="space-y-4">
+            <div className="border-l-4 border-green-500 pl-4">
+              <Label htmlFor="content" className="text-base font-semibold text-slate-800">
+                {messageType === 'email' ? 'Email Content' : 'Message Content'}
+              </Label>
+              <p className="text-sm text-slate-600 mt-1">
+                Craft your message using the available template variables
+              </p>
+            </div>
+            
             <Textarea
               id="content"
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              placeholder={`Write your ${messageType} message here...`}
-              rows={messageType === 'email' ? 8 : 5}
-              className="w-full resize-none"
+              placeholder={`Write your ${messageType === 'email' ? 'email' : 'text'} message here...`}
+              rows={messageType === 'email' ? 10 : 6}
+              className="text-base leading-relaxed py-4 px-4 border-2 focus:border-green-500 transition-colors resize-none"
             />
             
             {/* Template Variables Help */}
-            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-              <span>Available variables:</span>
-              <code className="px-1.5 py-0.5 bg-muted rounded text-xs">{"{{first_name}}"}</code>
-              <code className="px-1.5 py-0.5 bg-muted rounded text-xs">{"{{last_name}}"}</code>
-              <code className="px-1.5 py-0.5 bg-muted rounded text-xs">{"{{full_name}}"}</code>
+            <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-2 h-2 bg-slate-500 rounded-full"></div>
+                <span className="text-sm font-medium text-slate-700">Available Template Variables</span>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <code className="px-3 py-1.5 bg-white border border-slate-300 rounded-md text-sm font-mono text-slate-700 hover:bg-slate-100 transition-colors">
+                  {"{{first_name}}"}
+                </code>
+                <code className="px-3 py-1.5 bg-white border border-slate-300 rounded-md text-sm font-mono text-slate-700 hover:bg-slate-100 transition-colors">
+                  {"{{last_name}}"}
+                </code>
+                <code className="px-3 py-1.5 bg-white border border-slate-300 rounded-md text-sm font-mono text-slate-700 hover:bg-slate-100 transition-colors">
+                  {"{{full_name}}"}
+                </code>
+              </div>
             </div>
 
-            {/* Preview */}
+            {/* Message Preview */}
             {previewContent && previewContent !== content && (
-              <div className="p-4 bg-green-50 rounded-md border border-green-200">
-                <p className="text-xs font-medium text-green-700 mb-2">Message Preview:</p>
-                <div className="text-sm text-green-800 whitespace-pre-wrap leading-relaxed">
-                  {previewContent}
+              <div className="bg-green-50 border border-green-200 rounded-lg p-5">
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                  <p className="text-sm font-semibold text-green-700 uppercase tracking-wide">
+                    Message Preview
+                  </p>
+                </div>
+                <div className="bg-white border border-green-200/50 rounded-md p-4">
+                  <div className="text-base text-green-900 whitespace-pre-wrap leading-relaxed font-medium">
+                    {previewContent}
+                  </div>
                 </div>
               </div>
             )}
           </div>
         </div>
 
-        {/* Footer */}
-        <DialogFooter className="p-6 pt-4 border-t bg-muted/20">
-          <div className="flex items-center justify-end gap-3 w-full">
-            <Button variant="outline" onClick={onClose} disabled={sending}>
-              Cancel
-            </Button>
-            <Button 
-              onClick={handleSend} 
-              disabled={sending || !content.trim() || (messageType === 'email' && !subject.trim())}
-              className="min-w-[120px]"
-            >
-              {sending ? (
-                <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Sending...
-                </>
-              ) : (
-                <>
-                  <Send className="w-4 h-4 mr-2" />
-                  Send {messageType === 'email' ? 'Email' : 'Text'}
-                </>
+        {/* Footer Actions */}
+        <DialogFooter className="p-6 pt-5 border-t bg-gradient-to-r from-slate-50 to-slate-100/50">
+          <div className="flex items-center justify-between w-full">
+            {/* Message Stats */}
+            <div className="flex items-center gap-4 text-sm text-slate-600">
+              <div className="flex items-center gap-1">
+                <span>Characters:</span>
+                <span className="font-mono font-semibold">{content.length}</span>
+              </div>
+              {messageType === 'text' && (
+                <div className="flex items-center gap-1">
+                  <span>SMS Count:</span>
+                  <span className="font-mono font-semibold">{Math.ceil(content.length / 160)}</span>
+                </div>
               )}
-            </Button>
+            </div>
+            
+            {/* Action Buttons */}
+            <div className="flex items-center gap-3">
+              <Button 
+                variant="outline" 
+                onClick={onClose} 
+                disabled={sending}
+                className="px-6 border-slate-300 hover:bg-slate-50"
+              >
+                Cancel
+              </Button>
+              <Button 
+                onClick={handleSend} 
+                disabled={sending || !content.trim() || (messageType === 'email' && !subject.trim())}
+                className="px-8 bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
+              >
+                {sending ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Sending...
+                  </>
+                ) : (
+                  <>
+                    <Send className="w-4 h-4 mr-2" />
+                    Send {messageType === 'email' ? 'Email' : 'Message'}
+                  </>
+                )}
+              </Button>
+            </div>
           </div>
         </DialogFooter>
       </DialogContent>

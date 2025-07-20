@@ -14,7 +14,8 @@ const NewsletterGenerator = () => {
   const [formData, setFormData] = useState({
     topic: "",
     tone: "",
-    targetAudience: ""
+    targetAudience: "",
+    purpose: ""
   });
   const { toast } = useToast();
 
@@ -108,7 +109,8 @@ const NewsletterGenerator = () => {
         setFormData({
           topic: "",
           tone: "",
-          targetAudience: ""
+          targetAudience: "",
+          purpose: ""
         });
       } else {
         throw new Error("Failed to start newsletter generation");
@@ -130,30 +132,15 @@ const NewsletterGenerator = () => {
       <CardHeader>
         <CardTitle className="flex items-center gap-3">
           <div className="p-2 bg-primary/10 rounded-full">
-            <Mail className="h-5 w-5 text-primary" />
+            📧
           </div>
-          Newsletter Generator
+          Newsletter Campaign Generator
         </CardTitle>
         <p className="text-sm text-muted-foreground">
           Create AI-powered newsletters tailored to your yoga community
         </p>
       </CardHeader>
       <CardContent className="space-y-6">
-        {/* New Campaign Link */}
-        <div className="bg-gradient-to-r from-sage-50 to-orange-50 p-4 rounded-lg border border-sage-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="font-medium text-sage-800">✨ Try our new Newsletter Campaign Creator</h3>
-              <p className="text-sm text-sage-600">Enhanced form with yoga studio aesthetics and better targeting options</p>
-            </div>
-            <Link to="/newsletter-campaign">
-              <Button variant="outline" size="sm" className="border-sage-300 text-sage-700 hover:bg-sage-100">
-                <ExternalLink className="w-4 h-4 mr-2" />
-                Try New Form
-              </Button>
-            </Link>
-          </div>
-        </div>
         {/* Newsletter Topic */}
         <div className="space-y-2">
           <Label htmlFor="topic" className="flex items-center gap-2">
@@ -162,7 +149,7 @@ const NewsletterGenerator = () => {
           </Label>
           <Input
             id="topic"
-            placeholder="e.g., 'Benefits of Morning Yoga' or 'Mindfulness for Beginners'"
+            placeholder="e.g., Stress Relief & Mindfulness"
             value={formData.topic}
             onChange={(e) => handleInputChange("topic", e.target.value)}
             className="bg-background"
@@ -180,46 +167,47 @@ const NewsletterGenerator = () => {
               <SelectValue placeholder="Select the tone for your newsletter" />
             </SelectTrigger>
             <SelectContent>
-              {toneOptions.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
-                </SelectItem>
-              ))}
+              <SelectItem value="warm-encouraging">Warm & Encouraging</SelectItem>
+              <SelectItem value="motivational">Motivational</SelectItem>
+              <SelectItem value="inspiring">Inspiring</SelectItem>
+              <SelectItem value="professional">Professional</SelectItem>
+              <SelectItem value="casual-friendly">Casual & Friendly</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
         {/* Target Audience */}
         <div className="space-y-2">
-          <Label htmlFor="audience" className="flex items-center gap-2">
+          <Label className="flex items-center gap-2">
             <Users className="h-4 w-4 text-primary" />
             Target Audience
           </Label>
+          <Select value={formData.targetAudience} onValueChange={(value) => handleInputChange("targetAudience", value)}>
+            <SelectTrigger className="bg-background">
+              <SelectValue placeholder="Who should receive this newsletter?" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all-customers">All Customers</SelectItem>
+              <SelectItem value="intro-period">Intro Period Customers</SelectItem>
+              <SelectItem value="active-members">Active Members</SelectItem>
+              <SelectItem value="inactive-members">Inactive Members</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Newsletter Purpose */}
+        <div className="space-y-2">
+          <Label htmlFor="purpose" className="flex items-center gap-2">
+            <Mail className="h-4 w-4 text-primary" />
+            Newsletter Purpose
+          </Label>
           <Textarea
-            id="audience"
-            placeholder="Describe your target audience (e.g., 'Busy professionals looking for stress relief and work-life balance')"
-            value={formData.targetAudience}
-            onChange={(e) => handleInputChange("targetAudience", e.target.value)}
-            className="bg-background min-h-[80px]"
+            id="purpose"
+            placeholder="Describe what you want to achieve with this newsletter..."
+            value={formData.purpose || ""}
+            onChange={(e) => handleInputChange("purpose", e.target.value)}
+            className="bg-background min-h-[100px]"
           />
-          
-          {/* Audience Suggestions */}
-          <div className="space-y-2">
-            <p className="text-xs text-muted-foreground">Quick suggestions:</p>
-            <div className="flex flex-wrap gap-2">
-              {audienceSuggestions.slice(0, 4).map((suggestion, index) => (
-                <Button
-                  key={index}
-                  variant="outline"
-                  size="sm"
-                  className="text-xs bg-primary/5 hover:bg-primary/10 border-primary/20"
-                  onClick={() => handleInputChange("targetAudience", suggestion)}
-                >
-                  {suggestion}
-                </Button>
-              ))}
-            </div>
-          </div>
         </div>
 
         {/* Generate Button */}
@@ -237,20 +225,18 @@ const NewsletterGenerator = () => {
           ) : (
             <>
               <Sparkles className="h-4 w-4 mr-2" />
-              Create Newsletter Draft
+              Generate Newsletter
             </>
           )}
         </Button>
 
-        {/* Info Text */}
-        <div className="text-xs text-muted-foreground space-y-1 bg-primary/5 p-3 rounded-lg">
-          <p className="font-medium">How it works:</p>
-          <ul className="space-y-1 ml-4">
-            <li>• AI researches current trends related to your topic</li>
-            <li>• Creates engaging sections tailored to your audience</li>
-            <li>• Generates a complete newsletter with citations</li>
-            <li>• Sends the final result to your email</li>
-          </ul>
+        {/* Empty State */}
+        <div className="text-center py-12 border-2 border-dashed border-primary/20 rounded-lg bg-primary/5">
+          <Mail className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+          <h3 className="text-lg font-semibold text-foreground">No newsletters generated yet</h3>
+          <p className="text-muted-foreground">
+            Create your first AI-generated newsletter using the form above
+          </p>
         </div>
       </CardContent>
     </Card>

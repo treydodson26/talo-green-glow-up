@@ -62,9 +62,9 @@ const MarketingHub = () => {
               <div className="p-2 bg-green-100 dark:bg-green-900/20 rounded-lg">
                 <FileImage className="w-5 h-5 text-green-600" />
               </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Flyers Created</p>
-                <p className="text-2xl font-semibold">{marketingStats.totalFlyers}</p>
+               <div>
+                 <p className="text-sm text-muted-foreground">Newsletters Sent</p>
+                 <p className="text-2xl font-semibold">8</p>
               </div>
             </div>
           </CardContent>

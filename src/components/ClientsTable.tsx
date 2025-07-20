@@ -240,6 +240,27 @@ const ClientsTable = () => {
     recipient: string;
   }) => {
     try {
+      console.log('Attempting to send message with data:', messageData);
+      
+      // First, verify the customer exists
+      const { data: customerCheck, error: customerError } = await supabase
+        .from('customers')
+        .select('id, first_name, last_name')
+        .eq('id', messageData.customerId)
+        .single();
+      
+      if (customerError || !customerCheck) {
+        console.error('Customer not found:', customerError);
+        toast({
+          title: "Error",
+          description: `Customer with ID ${messageData.customerId} not found in database.`,
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      console.log('Customer verified:', customerCheck);
+      
       // Insert demo message into communications log to show in inbox
       const { error } = await supabase
         .from('communications_log')
@@ -255,7 +276,12 @@ const ClientsTable = () => {
           sent_at: new Date().toISOString()
         });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Database insert error:', error);
+        throw error;
+      }
+
+      console.log('Message successfully logged to database');
 
       toast({
         title: "Message Sent!",
@@ -264,8 +290,9 @@ const ClientsTable = () => {
     } catch (error) {
       console.error('Error logging message:', error);
       toast({
-        title: "Message Sent!",
-        description: `${messageData.messageType === 'email' ? 'Email' : 'Text message'} sent successfully to ${messageData.recipient}`,
+        title: "Error sending message",
+        description: `Failed to send ${messageData.messageType}. Please try again.`,
+        variant: "destructive",
       });
     }
   };

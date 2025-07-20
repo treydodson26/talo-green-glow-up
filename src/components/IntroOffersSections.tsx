@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Phone, Mail, MoreHorizontal, Calendar, Clock, Check } from "lucide-react";
+import { Phone, Mail, MoreHorizontal, Calendar, Clock, Check, MessageSquare } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import MessageModal from "@/components/MessageModal";
@@ -288,7 +288,7 @@ const IntroOffersSections = () => {
                             {sentMessages.has(`${customer.id}-text`) ? (
                               <Check className="w-4 h-4 mr-1 text-green-600" />
                             ) : (
-                              <Phone className="w-4 h-4 mr-1" />
+                              <MessageSquare className="w-4 h-4 mr-1" />
                             )}
                             Text
                           </Button>

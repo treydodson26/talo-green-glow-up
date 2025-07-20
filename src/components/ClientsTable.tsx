@@ -24,6 +24,7 @@ import IntroOffersSections from "@/components/IntroOffersSections";
 import WhatsAppMessaging from "@/components/WhatsAppMessaging";
 import AddCustomerDialog from "@/components/AddCustomerDialog";
 import IntroOfferDemo from "@/components/IntroOfferDemo";
+import MessageModal from "@/components/MessageModal";
 
 interface Customer {
   id: number;
@@ -48,8 +49,18 @@ const ClientsTable = () => {
   const [totalCustomerCount, setTotalCustomerCount] = useState(0);
   const [totalIntroOfferCount, setTotalIntroOfferCount] = useState(0);
   const [showAllIntroOffers, setShowAllIntroOffers] = useState(false);
-  const [activeTab, setActiveTab] = useState("clients"); // Add tab state
-  const [showAddDialog, setShowAddDialog] = useState(false); // Add dialog state
+  const [activeTab, setActiveTab] = useState("clients");
+  const [showAddDialog, setShowAddDialog] = useState(false);
+  const [messageModal, setMessageModal] = useState<{
+    isOpen: boolean;
+    customer: Customer | null;
+    messageType: 'email' | 'text';
+    template?: { subject?: string; content: string };
+  }>({
+    isOpen: false,
+    customer: null,
+    messageType: 'text'
+  });
   const { toast } = useToast();
 
   const filters = [
@@ -204,6 +215,41 @@ const ClientsTable = () => {
            customer.client_email.toLowerCase().includes(searchLower) ||
            (customer.phone_number && customer.phone_number.includes(searchTerm));
   });
+
+  // Handle opening message modal
+  const openMessageModal = (customer: Customer, messageType: 'email' | 'text') => {
+    const template = {
+      subject: messageType === 'email' ? `Hi ${customer.first_name}! How's your yoga journey going?` : undefined,
+      content: `Hi ${customer.first_name}! 👋 It's been a week since you joined Tallow Yoga. How are you feeling after your first classes? We'd love to hear about your experience so far! 💚`
+    };
+
+    setMessageModal({
+      isOpen: true,
+      customer,
+      messageType,
+      template
+    });
+  };
+
+  // Handle sending message (demo mode - no actual API call)
+  const handleSendMessage = async (messageData: {
+    customerId: number;
+    messageType: 'email' | 'text';
+    subject?: string;
+    content: string;
+    recipient: string;
+  }) => {
+    // Demo mode - just show success without calling API
+    console.log('Demo: Message would be sent with data:', messageData);
+    
+    // Simulate a brief delay for realism
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    toast({
+      title: "Message Sent!",
+      description: `${messageData.messageType === 'email' ? 'Email' : 'Text message'} sent successfully to ${messageData.recipient}`,
+    });
+  };
 
   return (
     <div className="flex-1 p-6 bg-background">
@@ -403,42 +449,8 @@ const ClientsTable = () => {
                               <Button 
                                 variant="ghost" 
                                 size="icon" 
-                                title="Send WhatsApp message"
-                                onClick={async () => {
-                                  try {
-                                    console.log(`Sending WhatsApp message to ${customer.first_name} ${customer.last_name}...`);
-                                    
-                                    const { data, error } = await supabase.functions.invoke('send-whatsapp-message', {
-                                      body: {
-                                        customer_id: customer.id,
-                                        message_content: `Hi ${customer.first_name}! 👋 It's been a week since you joined Tallow Yoga. How are you feeling after your first classes? We'd love to hear about your experience so far! 💚`,
-                                        message_type: 'day_7_followup'
-                                      }
-                                    });
-
-                                    if (error) {
-                                      console.error('Error sending WhatsApp message:', error);
-                                      toast({
-                                        title: "Error",
-                                        description: "Failed to send WhatsApp message. Please try again.",
-                                        variant: "destructive",
-                                      });
-                                    } else {
-                                      console.log('WhatsApp message sent successfully:', data);
-                                      toast({
-                                        title: "Message Sent",
-                                        description: `WhatsApp message sent to ${customer.first_name} ${customer.last_name}`,
-                                      });
-                                    }
-                                  } catch (error) {
-                                    console.error('Failed to send WhatsApp message:', error);
-                                    toast({
-                                      title: "Error",
-                                      description: "Failed to send WhatsApp message. Please try again.",
-                                      variant: "destructive",
-                                    });
-                                  }
-                                }}
+                                title="Send message"
+                                onClick={() => openMessageModal(customer, 'text')}
                               >
                                 <MessageCircle className="h-4 w-4" />
                               </Button>
@@ -447,9 +459,7 @@ const ClientsTable = () => {
                               variant="ghost" 
                               size="icon" 
                               title="Email customer"
-                              onClick={() => {
-                                window.open(`mailto:${customer.client_email}`, '_self');
-                              }}
+                              onClick={() => openMessageModal(customer, 'email')}
                             >
                               <Mail className="h-4 w-4" />
                             </Button>
@@ -559,6 +569,18 @@ const ClientsTable = () => {
         onOpenChange={setShowAddDialog}
         onCustomerAdded={handleCustomerAdded}
       />
+
+      {/* Message Modal */}
+      {messageModal.customer && (
+        <MessageModal
+          isOpen={messageModal.isOpen}
+          onClose={() => setMessageModal(prev => ({ ...prev, isOpen: false }))}
+          customer={messageModal.customer}
+          messageType={messageModal.messageType}
+          template={messageModal.template}
+          onSend={handleSendMessage}
+        />
+      )}
     </div>
   );
 };

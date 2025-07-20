@@ -6,7 +6,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { Mail, Sparkles, Users, MessageSquare } from "lucide-react";
+import { Mail, Sparkles, Users, MessageSquare, ExternalLink } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const NewsletterGenerator = () => {
   const [isGenerating, setIsGenerating] = useState(false);
@@ -138,6 +139,21 @@ const NewsletterGenerator = () => {
         </p>
       </CardHeader>
       <CardContent className="space-y-6">
+        {/* New Campaign Link */}
+        <div className="bg-gradient-to-r from-sage-50 to-orange-50 p-4 rounded-lg border border-sage-200">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="font-medium text-sage-800">✨ Try our new Newsletter Campaign Creator</h3>
+              <p className="text-sm text-sage-600">Enhanced form with yoga studio aesthetics and better targeting options</p>
+            </div>
+            <Link to="/newsletter-campaign">
+              <Button variant="outline" size="sm" className="border-sage-300 text-sage-700 hover:bg-sage-100">
+                <ExternalLink className="w-4 h-4 mr-2" />
+                Try New Form
+              </Button>
+            </Link>
+          </div>
+        </div>
         {/* Newsletter Topic */}
         <div className="space-y-2">
           <Label htmlFor="topic" className="flex items-center gap-2">

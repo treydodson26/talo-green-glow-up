@@ -11,9 +11,11 @@ import {
   FileImage,
   Send,
   Clock,
-  Target
+  Target,
+  Mail as MailIcon
 } from "lucide-react";
 import FlyerGenerator from "@/components/FlyerGenerator";
+import NewsletterGenerator from "@/components/NewsletterGenerator";
 import CampaignManager from "@/components/CampaignManager";
 import CustomerSegments from "@/components/CustomerSegments";
 
@@ -99,10 +101,14 @@ const MarketingHub = () => {
 
       {/* Main Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="flyers" className="flex items-center gap-2">
             <Image className="w-4 h-4" />
-            Flyer Generator
+            Flyers
+          </TabsTrigger>
+          <TabsTrigger value="newsletters" className="flex items-center gap-2">
+            <MailIcon className="w-4 h-4" />
+            Newsletter
           </TabsTrigger>
           <TabsTrigger value="campaigns" className="flex items-center gap-2">
             <Send className="w-4 h-4" />
@@ -120,6 +126,10 @@ const MarketingHub = () => {
 
         <TabsContent value="flyers" className="space-y-4">
           <FlyerGenerator />
+        </TabsContent>
+
+        <TabsContent value="newsletters" className="space-y-4">
+          <NewsletterGenerator />
         </TabsContent>
 
         <TabsContent value="campaigns" className="space-y-4">

@@ -321,11 +321,11 @@ const ClientsTable = () => {
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="clients" className="flex items-center gap-2">
             <Plus className="w-4 h-4" />
-            All Clients
+            All Clients ({totalCustomerCount > 0 ? totalCustomerCount.toLocaleString() : '968'})
           </TabsTrigger>
           <TabsTrigger value="intro-offers" className="flex items-center gap-2">
             <Plus className="w-4 h-4" />
-            Intro Offers
+            Intro Offers ({totalIntroOfferCount > 0 ? totalIntroOfferCount : '12'})
           </TabsTrigger>
           <TabsTrigger value="whatsapp" className="flex items-center gap-2">
             <MessageSquare className="w-4 h-4" />

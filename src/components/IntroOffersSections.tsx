@@ -49,11 +49,12 @@ const IntroOffersSections = () => {
     try {
       setLoading(true);
 
-      // Load message sequences
+      // Load message sequences - only show specific days (0, 7, 10, 14, 28)
       const { data: sequences, error: sequencesError } = await supabase
         .from('message_sequences')
         .select('*')
         .eq('active', true)
+        .in('day', [0, 7, 10, 14, 28])
         .order('day');
 
       if (sequencesError) throw sequencesError;
@@ -102,8 +103,15 @@ const IntroOffersSections = () => {
 
   const getMessageTypeBadge = (messageType: string) => {
     return (
-      <Badge variant={messageType === 'email' ? 'default' : 'secondary'} className="text-xs">
-        {messageType === 'email' ? 'Email' : 'Text'}
+      <Badge 
+        variant="outline" 
+        className={`text-xs font-semibold ${
+          messageType === 'email' 
+            ? 'bg-blue-50 text-blue-700 border-blue-200' 
+            : 'bg-orange-50 text-orange-700 border-orange-200'
+        }`}
+      >
+        {messageType === 'email' ? 'Email' : 'WhatsApp'}
       </Badge>
     );
   };
@@ -115,6 +123,36 @@ const IntroOffersSections = () => {
     setModalOpen(true);
   };
 
+  const sendToWebhook = async (day: number, customer: Customer, messageType: 'email' | 'text') => {
+    try {
+      const webhookUrl = "https://treydodson26.app.n8n.cloud/webhook-test/6f179aa7-ffa8-42b4-bf23-4b85169c34de";
+      
+      const payload = {
+        day: `Day ${day}`,
+        recipient_email: customer.client_email,
+        custom_message: selectedTemplate?.content || `${messageType === 'email' ? 'Email' : 'Text'} for Day ${day}`,
+        customer_name: `${customer.first_name} ${customer.last_name}`
+      };
+
+      const response = await fetch(webhookUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Webhook failed: ${response.status}`);
+      }
+
+      return true;
+    } catch (error) {
+      console.error('Error sending webhook:', error);
+      throw error;
+    }
+  };
+
   const onSendMessage = async (messageData: {
     customerId: number;
     messageType: 'email' | 'text';
@@ -122,14 +160,23 @@ const IntroOffersSections = () => {
     content: string;
     recipient: string;
   }) => {
-    // For demo purposes - simulate successful message sending and log to database
+    const messageKey = `${messageData.customerId}-${messageData.messageType}`;
+    
     try {
+      // Show loading state
+      setSentMessages(prev => new Set([...prev, `${messageKey}-loading`]));
+
+      // Send to webhook first
+      if (selectedCustomer && selectedTemplate) {
+        await sendToWebhook(selectedTemplate.day, selectedCustomer, messageData.messageType);
+      }
+
       // Log the communication to database for inbox display
-      const { error: logError } = await supabase
+      await supabase
         .from('communications_log')
         .insert({
           customer_id: messageData.customerId,
-          message_sequence_id: messageData.messageType === 'email' ? 0 : 999, // Use appropriate manual sequence ID
+          message_sequence_id: selectedTemplate?.id || 0,
           message_type: messageData.messageType,
           content: messageData.content,
           subject: messageData.subject,
@@ -139,29 +186,35 @@ const IntroOffersSections = () => {
           sent_at: new Date().toISOString()
         });
 
-      // Add to sent messages for UI indication
-      const messageKey = `${messageData.customerId}-${messageData.messageType}`;
-      setSentMessages(prev => new Set([...prev, messageKey]));
+      // Remove loading state and add success state
+      setSentMessages(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(`${messageKey}-loading`);
+        newSet.add(messageKey);
+        return newSet;
+      });
 
       toast({
         title: "Message sent successfully",
         description: `${messageData.messageType === 'email' ? 'Email' : 'Text'} sent to ${selectedCustomer?.first_name} ${selectedCustomer?.last_name}`,
       });
 
-      // Close the modal
       setModalOpen(false);
     } catch (error) {
-      console.error('Error logging message:', error);
-      // Still show success for demo
-      const messageKey = `${messageData.customerId}-${messageData.messageType}`;
-      setSentMessages(prev => new Set([...prev, messageKey]));
+      console.error('Error sending message:', error);
+      
+      // Remove loading state
+      setSentMessages(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(`${messageKey}-loading`);
+        return newSet;
+      });
       
       toast({
-        title: "Message sent successfully",
-        description: `${messageData.messageType === 'email' ? 'Email' : 'Text'} sent to ${selectedCustomer?.first_name} ${selectedCustomer?.last_name}`,
+        title: "Error sending message",
+        description: "Failed to send message. Please try again.",
+        variant: "destructive",
       });
-
-      setModalOpen(false);
     }
   };
 
@@ -196,34 +249,48 @@ const IntroOffersSections = () => {
           const customers = demoCustomers[sequence.day] || [];
           
           return (
-            <Card key={sequence.id} className="border shadow-sm">
-              <CardHeader className="pb-4 bg-black text-white border-b">
+            <Card key={sequence.id} className="border-2 shadow-lg hover:shadow-xl transition-shadow duration-200">
+              <CardHeader className={`pb-6 border-b-2 ${
+                sequence.message_type === 'email' 
+                  ? 'bg-gradient-to-r from-blue-50 to-blue-100 border-blue-200' 
+                  : 'bg-gradient-to-r from-orange-50 to-orange-100 border-orange-200'
+              }`}>
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="flex items-center gap-2">
-                      <div className="p-2 rounded-full bg-green-100 border border-green-200">
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-3">
+                      <div className={`p-3 rounded-xl shadow-sm ${
+                        sequence.message_type === 'email' 
+                          ? 'bg-blue-100 border-2 border-blue-200' 
+                          : 'bg-orange-100 border-2 border-orange-200'
+                      }`}>
                         {getMessageTypeIcon(sequence.message_type)}
                       </div>
-                      <CardTitle className="text-lg text-white">
-                        Day {sequence.day} - {sequence.message_type === 'email' ? 'Email' : 'Text Message'}
+                      <CardTitle className="text-2xl font-bold text-gray-900">
+                        Day {sequence.day}
                       </CardTitle>
                     </div>
                     {getMessageTypeBadge(sequence.message_type)}
                   </div>
-                  <Badge variant="secondary" className="bg-green-100 text-green-800">
+                  <Badge 
+                    variant="outline" 
+                    className="text-sm font-semibold bg-white text-gray-700 border-gray-300 px-3 py-1"
+                  >
                     {customers.length} customer{customers.length !== 1 ? 's' : ''}
                   </Badge>
                 </div>
                 
                 {sequence.subject && (
-                  <p className="text-sm text-gray-700 font-medium mt-2 bg-white rounded px-3 py-1 border">
-                    Subject: {sequence.subject}
-                  </p>
+                  <div className="mt-4 p-4 bg-white rounded-lg border-2 border-gray-200 shadow-sm">
+                    <p className="text-sm font-semibold text-gray-700 mb-1">Subject:</p>
+                    <p className="text-base font-medium text-gray-900">{sequence.subject}</p>
+                  </div>
                 )}
                 
-                <p className="text-sm text-gray-600 line-clamp-2 mt-1 italic">
-                  {sequence.content.substring(0, 150)}...
-                </p>
+                <div className="mt-3 p-3 bg-white/70 rounded-lg border border-gray-200">
+                  <p className="text-sm text-gray-600 leading-relaxed">
+                    {sequence.content.substring(0, 180)}...
+                  </p>
+                </div>
               </CardHeader>
 
               <CardContent className="p-6">
@@ -266,22 +333,28 @@ const IntroOffersSections = () => {
                           )}
                         </div>
 
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-3">
                           {/* Only show Text button for text sequences, Email button for email sequences */}
                           {sequence.message_type === 'text' && (
                             <Button 
                               variant="outline" 
                               size="sm"
                               onClick={() => handleSendMessage(customer, 'text', sequence)}
-                              disabled={!customer.phone_number}
-                              className="border-green-300 hover:bg-green-50"
+                              disabled={!customer.phone_number || sentMessages.has(`${customer.id}-text-loading`)}
+                              className={`px-4 py-2 font-semibold transition-all duration-200 hover:scale-105 ${
+                                sentMessages.has(`${customer.id}-text`) 
+                                  ? 'bg-green-100 border-green-400 text-green-700 hover:bg-green-200' 
+                                  : 'bg-orange-50 border-orange-300 text-orange-700 hover:bg-orange-100 hover:border-orange-400'
+                              }`}
                             >
-                              {sentMessages.has(`${customer.id}-text`) ? (
-                                <Check className="w-4 h-4 mr-1 text-green-600" />
+                              {sentMessages.has(`${customer.id}-text-loading`) ? (
+                                <div className="w-4 h-4 mr-2 border-2 border-orange-600 border-t-transparent rounded-full animate-spin" />
+                              ) : sentMessages.has(`${customer.id}-text`) ? (
+                                <Check className="w-4 h-4 mr-2 text-green-600" />
                               ) : (
-                                <MessageSquare className="w-4 h-4 mr-1" />
+                                <MessageSquare className="w-4 h-4 mr-2" />
                               )}
-                              Text
+                              {sentMessages.has(`${customer.id}-text`) ? 'Sent!' : 'Send WhatsApp'}
                             </Button>
                           )}
                           
@@ -290,18 +363,25 @@ const IntroOffersSections = () => {
                               variant="outline" 
                               size="sm"
                               onClick={() => handleSendMessage(customer, 'email', sequence)}
-                              className="border-green-300 hover:bg-green-50"
+                              disabled={sentMessages.has(`${customer.id}-email-loading`)}
+                              className={`px-4 py-2 font-semibold transition-all duration-200 hover:scale-105 ${
+                                sentMessages.has(`${customer.id}-email`) 
+                                  ? 'bg-green-100 border-green-400 text-green-700 hover:bg-green-200' 
+                                  : 'bg-blue-50 border-blue-300 text-blue-700 hover:bg-blue-100 hover:border-blue-400'
+                              }`}
                             >
-                              {sentMessages.has(`${customer.id}-email`) ? (
-                                <Check className="w-4 h-4 mr-1 text-green-600" />
+                              {sentMessages.has(`${customer.id}-email-loading`) ? (
+                                <div className="w-4 h-4 mr-2 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
+                              ) : sentMessages.has(`${customer.id}-email`) ? (
+                                <Check className="w-4 h-4 mr-2 text-green-600" />
                               ) : (
-                                <Mail className="w-4 h-4 mr-1" />
+                                <Mail className="w-4 h-4 mr-2" />
                               )}
-                              Email
+                              {sentMessages.has(`${customer.id}-email`) ? 'Sent!' : 'Send Email'}
                             </Button>
                           )}
                           
-                          <Button variant="ghost" size="sm">
+                          <Button variant="ghost" size="sm" className="text-gray-500 hover:text-gray-700">
                             <MoreHorizontal className="w-4 h-4" />
                           </Button>
                         </div>

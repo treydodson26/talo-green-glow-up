@@ -128,10 +128,11 @@ const IntroOffersSections = () => {
       const webhookUrl = "https://treydodson26.app.n8n.cloud/webhook-test/6f179aa7-ffa8-42b4-bf23-4b85169c34de";
       
       const payload = {
-        day: `Day ${day}`,
-        recipient_email: customer.client_email,
-        custom_message: selectedTemplate?.content || `${messageType === 'email' ? 'Email' : 'Text'} for Day ${day}`,
-        customer_name: `${customer.first_name} ${customer.last_name}`
+        Day: `Day ${day}`,
+        Recipient: customer.client_email,
+        CustomerMessage: selectedTemplate?.content || `${messageType === 'email' ? 'Email' : 'Text'} for Day ${day}`,
+        CustomerName: `${customer.first_name} ${customer.last_name}`,
+        MessageType: messageType
       };
 
       const response = await fetch(webhookUrl, {

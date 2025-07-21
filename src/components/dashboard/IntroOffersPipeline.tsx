@@ -2,52 +2,131 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Mail, MessageSquare, Clock, CheckCircle } from "lucide-react";
+import { Mail, MessageSquare, Clock, CheckCircle, AlertTriangle, TrendingUp, Calendar } from "lucide-react";
 import { useIntroCustomers } from "@/hooks/useDashboard";
+import React from "react";
 
 export const IntroOffersPipeline = () => {
   const { data: introCustomers, isLoading } = useIntroCustomers();
 
-  const getSequenceDay = (firstClassDate: string) => {
+  // Calculate days since first class
+  const getDaysSinceFirstClass = (firstClassDate: string) => {
     const startDate = new Date(firstClassDate);
     const today = new Date();
     const diffTime = Math.abs(today.getTime() - startDate.getTime());
     return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   };
 
-  const getDaysRemaining = (introEndDate: string) => {
-    const endDate = new Date(introEndDate);
+  // Calculate days since last visit (mock data for now)
+  const getDaysSinceLastVisit = (lastSeenDate: string) => {
+    if (!lastSeenDate) return 0;
+    const lastSeen = new Date(lastSeenDate);
     const today = new Date();
-    const diffTime = endDate.getTime() - today.getTime();
+    const diffTime = Math.abs(today.getTime() - lastSeen.getTime());
     return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   };
 
-  const getPhaseInfo = (sequenceDay: number) => {
-    if (sequenceDay <= 2) return { phase: "Welcome Phase", color: "bg-blue-100 text-blue-800", description: "New customers need welcome messages" };
-    if (sequenceDay <= 7) return { phase: "Engagement Phase", color: "bg-green-100 text-green-800", description: "Building connection and momentum" };
-    if (sequenceDay <= 21) return { phase: "Momentum Phase", color: "bg-yellow-100 text-yellow-800", description: "Encouraging continued practice" };
-    return { phase: "Conversion Phase", color: "bg-red-100 text-red-800", description: "Converting to membership" };
+  // Emily's business logic for status determination
+  const getCustomerStatus = (customer: any) => {
+    const daysSinceFirst = getDaysSinceFirstClass(customer.first_class_date);
+    const daysSinceLastVisit = getDaysSinceLastVisit(customer.last_seen);
+    const totalClasses = 2; // Mock data for now - we'll need to add this field
+    const classesPerWeek = totalClasses / Math.max(1, Math.floor(daysSinceFirst / 7));
+
+    // Red Alert: Day 25+ without conversion OR 7+ days since last visit OR only 1-2 classes total
+    if (daysSinceFirst >= 25 || daysSinceLastVisit >= 7 || totalClasses <= 2) {
+      return {
+        status: 'at-risk',
+        color: 'destructive',
+        bgClass: 'border-destructive/50 bg-destructive/5',
+        priority: 1,
+        reason: daysSinceFirst >= 25 ? 'Day 25+ - needs conversion talk' :
+                daysSinceLastVisit >= 7 ? `${daysSinceLastVisit} days since last visit` :
+                'Only attended 1-2 classes'
+      };
+    }
+
+    // High Priority: Haven't returned in 5+ days (especially after 1-2 classes)
+    if (daysSinceLastVisit >= 5) {
+      return {
+        status: 'needs-attention',
+        color: 'secondary',
+        bgClass: 'border-orange-200 bg-orange-50',
+        priority: 2,
+        reason: `${daysSinceLastVisit} days since last visit`
+      };
+    }
+
+    // Medium: Regular attendance but day 15+ (conversion conversation time)
+    if (daysSinceFirst >= 15 && classesPerWeek >= 1.5) {
+      return {
+        status: 'conversion-ready',
+        color: 'default',
+        bgClass: 'border-blue-200 bg-blue-50',
+        priority: 3,
+        reason: 'Ready for conversion conversation'
+      };
+    }
+
+    // On Track: 2+ classes/week, asking questions, engaging
+    return {
+      status: 'on-track',
+      color: 'default',
+      bgClass: 'border-green-200 bg-green-50',
+      priority: 4,
+      reason: 'Coming regularly'
+    };
   };
 
-  const groupedCustomers = introCustomers?.reduce((acc, customer) => {
-    const sequenceDay = getSequenceDay(customer.first_class_date);
-    const phase = getPhaseInfo(sequenceDay).phase;
+  // Emily's action prioritization
+  const getPriorityAction = (customer: any, status: any) => {
+    const daysSinceFirst = getDaysSinceFirstClass(customer.first_class_date);
     
-    if (!acc[phase]) acc[phase] = [];
-    acc[phase].push({ ...customer, sequenceDay });
-    return acc;
-  }, {} as Record<string, any[]>) || {};
+    if (status.priority === 1) {
+      if (daysSinceFirst >= 25) return "Schedule conversion call";
+      if (status.reason.includes('days since')) return "Immediate check-in call";
+      return "Re-engagement sequence";
+    }
+    
+    if (status.priority === 2) {
+      return "Follow-up text/email";
+    }
+    
+    if (status.priority === 3) {
+      return "Membership conversation";
+    }
+    
+    return "Continue nurturing";
+  };
+
+  // Sort customers by priority and urgency
+  const sortedCustomers = introCustomers?.map(customer => {
+    const status = getCustomerStatus(customer);
+    const daysSinceFirst = getDaysSinceFirstClass(customer.first_class_date);
+    return {
+      ...customer,
+      status,
+      daysSinceFirst,
+      action: getPriorityAction(customer, status)
+    };
+  }).sort((a, b) => {
+    // Sort by priority (1=highest), then by days since first class
+    if (a.status.priority !== b.status.priority) {
+      return a.status.priority - b.status.priority;
+    }
+    return b.daysSinceFirst - a.daysSinceFirst;
+  }) || [];
 
   if (isLoading) {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Intro Offers Pipeline</CardTitle>
+          <CardTitle>Intro Pipeline - Loading...</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="animate-pulse space-y-4">
-            {[...Array(3)].map((_, i) => (
-              <div key={i} className="h-20 bg-muted rounded"></div>
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="h-24 bg-muted rounded"></div>
             ))}
           </div>
         </CardContent>
@@ -55,90 +134,111 @@ export const IntroOffersPipeline = () => {
     );
   }
 
+  // Group by priority for display
+  const priorityGroups = {
+    'Red Alert': sortedCustomers.filter(c => c.status.priority === 1),
+    'High Priority': sortedCustomers.filter(c => c.status.priority === 2),
+    'Medium Priority': sortedCustomers.filter(c => c.status.priority === 3),
+    'On Track': sortedCustomers.filter(c => c.status.priority === 4)
+  };
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Clock className="h-5 w-5" />
-          Intro Offers Pipeline
-        </CardTitle>
+        <div className="flex items-center justify-between">
+          <CardTitle className="flex items-center gap-2">
+            <TrendingUp className="h-5 w-5" />
+            Intro Pipeline Dashboard
+          </CardTitle>
+          <Badge variant="outline">
+            {sortedCustomers.length} active intro students
+          </Badge>
+        </div>
       </CardHeader>
       <CardContent className="space-y-6">
-        {Object.entries(groupedCustomers).map(([phase, customers]) => {
-          const phaseInfo = getPhaseInfo(customers[0]?.sequenceDay || 0);
+        {Object.entries(priorityGroups).map(([groupName, customers]) => {
+          if (customers.length === 0) return null;
           
+          const groupIcon = groupName === 'Red Alert' ? AlertTriangle : 
+                           groupName === 'High Priority' ? Clock :
+                           groupName === 'Medium Priority' ? Calendar : CheckCircle;
+
           return (
-            <div key={phase} className="space-y-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Badge className={phaseInfo.color}>
-                    {phase} ({customers.length})
-                  </Badge>
-                  <span className="text-sm text-muted-foreground">
-                    {phaseInfo.description}
-                  </span>
-                </div>
+            <div key={groupName} className="space-y-3">
+              <div className="flex items-center gap-2">
+                {React.createElement(groupIcon, { 
+                  className: `h-4 w-4 ${
+                    groupName === 'Red Alert' ? 'text-destructive' :
+                    groupName === 'High Priority' ? 'text-orange-500' :
+                    groupName === 'Medium Priority' ? 'text-blue-500' : 'text-green-500'
+                  }` 
+                })}
+                <h3 className="font-medium text-sm">
+                  {groupName} ({customers.length})
+                </h3>
               </div>
               
-              <div className="grid gap-2">
-                {customers.map((customer) => {
-                  const daysRemaining = getDaysRemaining(customer.intro_end_date);
-                  const isUrgent = daysRemaining <= 2;
-                  
-                  return (
-                    <div 
-                      key={customer.id} 
-                      className={`p-3 rounded-lg border ${isUrgent ? 'border-red-200 bg-red-50' : 'border-border bg-card'}`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <Avatar className="h-8 w-8">
-                            <AvatarFallback className="text-xs">
-                              {customer.first_name[0]}{customer.last_name[0]}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <span className="font-medium text-sm">
-                                {customer.first_name} {customer.last_name}
-                              </span>
-                              <Badge variant="outline" className="text-xs">
-                                Day {customer.sequenceDay}
-                              </Badge>
-                              {isUrgent && (
-                                <Badge variant="destructive" className="text-xs">
-                                  {daysRemaining} days left
-                                </Badge>
-                              )}
-                            </div>
-                            <div className="text-xs text-muted-foreground">
-                              {customer.client_email} • {customer.customer_segment}
-                            </div>
+              <div className="space-y-2">
+                {customers.map((customer) => (
+                  <div 
+                    key={customer.id} 
+                    className={`p-4 rounded-lg border transition-colors ${customer.status.bgClass}`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <Avatar className="h-10 w-10">
+                          <AvatarFallback className="text-sm font-medium">
+                            {customer.first_name?.[0] || 'N'}{customer.last_name?.[0] || 'A'}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="font-medium">
+                              {customer.first_name} {customer.last_name}
+                            </span>
+                            <Badge variant="outline" className="text-xs">
+                              Day {customer.daysSinceFirst}
+                            </Badge>
+                            <Badge 
+                              variant={customer.status.color as any}
+                              className="text-xs"
+                            >
+                              {customer.status.reason}
+                            </Badge>
+                          </div>
+                          <div className="text-sm text-muted-foreground mb-1">
+                            {customer.client_email} • Classes: 2
+                          </div>
+                          <div className="text-sm font-medium text-primary">
+                            Action: {customer.action}
                           </div>
                         </div>
-                        
-                        <div className="flex items-center gap-1">
-                          <Button size="sm" variant="outline" className="h-7 w-7 p-0">
-                            <Mail className="h-3 w-3" />
-                          </Button>
-                          <Button size="sm" variant="outline" className="h-7 w-7 p-0">
-                            <MessageSquare className="h-3 w-3" />
-                          </Button>
-                        </div>
+                      </div>
+                      
+                      <div className="flex items-center gap-2">
+                        <Button size="sm" variant="outline">
+                          <Mail className="h-4 w-4 mr-1" />
+                          Email
+                        </Button>
+                        <Button size="sm" variant="outline">
+                          <MessageSquare className="h-4 w-4 mr-1" />
+                          Text
+                        </Button>
                       </div>
                     </div>
-                  );
-                })}
+                  </div>
+                ))}
               </div>
             </div>
           );
         })}
         
-        {Object.keys(groupedCustomers).length === 0 && (
-          <div className="text-center py-8 text-muted-foreground">
-            <CheckCircle className="h-12 w-12 mx-auto mb-2 text-green-500" />
-            <p>No active intro offers at the moment</p>
-            <p className="text-sm">New customers will appear here when they start their trial</p>
+        {sortedCustomers.length === 0 && (
+          <div className="text-center py-12 text-muted-foreground">
+            <CheckCircle className="h-16 w-16 mx-auto mb-4 text-green-500" />
+            <h3 className="text-lg font-medium mb-2">All caught up!</h3>
+            <p>No active intro offers at the moment.</p>
+            <p className="text-sm">New students will appear here when they start their trial.</p>
           </div>
         )}
       </CardContent>

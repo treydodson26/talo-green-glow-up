@@ -226,13 +226,28 @@ const IntroOffersSections = () => {
     );
   }
 
-  // Create demo data for each day
+  // Create demo data for each day - including Trey for demo purposes
   const demoCustomers = {
-    0: [{ id: 1, first_name: 'Trey', last_name: 'Dotson', client_email: 'trey@example.com', phone_number: '+1234567890', current_day: 0, days_remaining: 30, intro_status: 'active', created_at: '2024-01-01', last_seen: '2024-01-01', tags: 'new' }],
-    7: [{ id: 2, first_name: 'Sarah', last_name: 'Johnson', client_email: 'sarah@example.com', phone_number: '+1234567891', current_day: 7, days_remaining: 23, intro_status: 'active', created_at: '2023-12-25', last_seen: '2024-01-01', tags: 'engaged' }],
-    10: [{ id: 3, first_name: 'Mike', last_name: 'Chen', client_email: 'mike@example.com', phone_number: '+1234567892', current_day: 10, days_remaining: 20, intro_status: 'active', created_at: '2023-12-22', last_seen: '2024-01-01', tags: 'regular' }],
-    14: [{ id: 4, first_name: 'Lisa', last_name: 'Williams', client_email: 'lisa@example.com', phone_number: '+1234567893', current_day: 14, days_remaining: 16, intro_status: 'active', created_at: '2023-12-18', last_seen: '2024-01-01', tags: 'consistent' }],
-    28: [{ id: 5, first_name: 'David', last_name: 'Brown', client_email: 'david@example.com', phone_number: '+1234567894', current_day: 28, days_remaining: 2, intro_status: 'active', created_at: '2023-12-04', last_seen: '2024-01-01', tags: 'convert-ready' }]
+    0: [
+      { id: 1, first_name: 'Trey', last_name: 'Dodson', client_email: 'treydodson26@gmail.com', phone_number: '4697046880', current_day: 0, days_remaining: 30, intro_status: 'active', created_at: '2024-01-21', last_seen: '2024-01-21', tags: 'demo' },
+      { id: 10, first_name: 'Sarah', last_name: 'Johnson', client_email: 'sarah@example.com', phone_number: '+1234567891', current_day: 0, days_remaining: 30, intro_status: 'active', created_at: '2024-01-21', last_seen: '2024-01-21', tags: 'new' }
+    ],
+    7: [
+      { id: 2, first_name: 'Trey', last_name: 'Dodson', client_email: 'treydodson26@gmail.com', phone_number: '4697046880', current_day: 7, days_remaining: 23, intro_status: 'active', created_at: '2024-01-14', last_seen: '2024-01-20', tags: 'demo' },
+      { id: 11, first_name: 'Mike', last_name: 'Chen', client_email: 'mike@example.com', phone_number: '+1234567892', current_day: 7, days_remaining: 23, intro_status: 'active', created_at: '2024-01-14', last_seen: '2024-01-20', tags: 'engaged' }
+    ],
+    10: [
+      { id: 3, first_name: 'Trey', last_name: 'Dodson', client_email: 'treydodson26@gmail.com', phone_number: '4697046880', current_day: 10, days_remaining: 20, intro_status: 'active', created_at: '2024-01-11', last_seen: '2024-01-20', tags: 'demo' },
+      { id: 12, first_name: 'Lisa', last_name: 'Williams', client_email: 'lisa@example.com', phone_number: '+1234567893', current_day: 10, days_remaining: 20, intro_status: 'active', created_at: '2024-01-11', last_seen: '2024-01-20', tags: 'regular' }
+    ],
+    14: [
+      { id: 4, first_name: 'Trey', last_name: 'Dodson', client_email: 'treydodson26@gmail.com', phone_number: '4697046880', current_day: 14, days_remaining: 16, intro_status: 'active', created_at: '2024-01-07', last_seen: '2024-01-19', tags: 'demo' },
+      { id: 13, first_name: 'David', last_name: 'Brown', client_email: 'david@example.com', phone_number: '+1234567894', current_day: 14, days_remaining: 16, intro_status: 'active', created_at: '2024-01-07', last_seen: '2024-01-19', tags: 'consistent' }
+    ],
+    28: [
+      { id: 5, first_name: 'Trey', last_name: 'Dodson', client_email: 'treydodson26@gmail.com', phone_number: '4697046880', current_day: 28, days_remaining: 2, intro_status: 'active', created_at: '2023-12-24', last_seen: '2024-01-18', tags: 'demo' },
+      { id: 14, first_name: 'Emily', last_name: 'Studio', client_email: 'emily@example.com', phone_number: '+1234567895', current_day: 28, days_remaining: 2, intro_status: 'active', created_at: '2023-12-24', last_seen: '2024-01-18', tags: 'convert-ready' }
+    ]
   };
 
   return (

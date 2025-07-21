@@ -1,5 +1,6 @@
 import { useState } from "react";
-import Sidebar from "@/components/Sidebar";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/AppSidebar";
 import TopBar from "@/components/TopBar";
 import ClientsTable from "@/components/ClientsTable";
 import HomePage from "@/components/HomePage";
@@ -45,13 +46,15 @@ const MainLayout = () => {
   };
 
   return (
-    <div className="flex h-screen bg-background">
-      <Sidebar activeRoute={activeRoute} onRouteChange={setActiveRoute} />
-      <div className="flex-1 flex flex-col">
-        <TopBar />
-        {renderContent()}
+    <SidebarProvider>
+      <div className="flex min-h-screen w-full bg-background">
+        <AppSidebar activeRoute={activeRoute} onRouteChange={setActiveRoute} />
+        <div className="flex-1 flex flex-col">
+          <TopBar />
+          {renderContent()}
+        </div>
       </div>
-    </div>
+    </SidebarProvider>
   );
 };
 

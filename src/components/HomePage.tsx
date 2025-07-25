@@ -5,6 +5,7 @@ import { IntroOffersPipeline } from "./dashboard/IntroOffersPipeline";
 import { TodaysClasses } from "./dashboard/TodaysClasses";
 import { CommunicationCenter } from "./dashboard/CommunicationCenter";
 import { QuickActions } from "./dashboard/QuickActions";
+import { TestWhatsApp } from "@/components/TestWhatsApp";
 import { Card, CardContent } from "@/components/ui/card";
 
 const HomePage = () => {
@@ -121,6 +122,9 @@ const HomePage = () => {
               <h2 className="text-xl font-medium text-foreground">Quick Actions</h2>
             </div>
             <QuickActions />
+            <div className="mt-4">
+              <TestWhatsApp />
+            </div>
           </div>
         </div>
       </div>

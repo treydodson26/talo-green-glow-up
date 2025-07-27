@@ -125,7 +125,7 @@ const IntroOffersSections = () => {
 
   const sendToWebhook = async (day: number, customer: Customer, messageType: 'email' | 'text') => {
     try {
-      const webhookUrl = "https://treydodson26.app.n8n.cloud/webhook-test/6f179aa7-ffa8-42b4-bf23-4b85169c34de";
+      const webhookUrl = "https://treydodson26.app.n8n.cloud/webhook/3cf6de19-b9d9-4add-a085-56884822ea36";
       
       const payload = {
         Day: `Day ${day}`,

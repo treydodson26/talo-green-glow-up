@@ -114,7 +114,7 @@ Founder, Talo Yoga`
   const testWebhook = async (sequence: any) => {
     setLoading(sequence.day);
     try {
-      const webhookUrl = "https://treydodson26.app.n8n.cloud/webhook-test/6f179aa7-ffa8-42b4-bf23-4b85169c34de";
+      const webhookUrl = "https://treydodson26.app.n8n.cloud/webhook/3cf6de19-b9d9-4add-a085-56884822ea36";
       
       // Replace placeholder with actual name
       const personalizedContent = sequence.content.replace(/\{\{first_name\}\}/g, testCustomer.first_name);

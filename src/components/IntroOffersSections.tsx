@@ -167,10 +167,7 @@ const IntroOffersSections = () => {
       // Show loading state
       setSentMessages(prev => new Set([...prev, `${messageKey}-loading`]));
 
-      // Send to webhook first
-      if (selectedCustomer && selectedTemplate) {
-        await sendToWebhook(selectedTemplate.day, selectedCustomer, messageData.messageType);
-      }
+      // Database trigger will automatically send webhook when we insert into communications_log
 
       // Log the communication to database for inbox display
       await supabase

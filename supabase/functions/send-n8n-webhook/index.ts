@@ -16,11 +16,12 @@ serve(async (req) => {
     
     const webhookUrl = "https://treydodson26.app.n8n.cloud/webhook-test/3cf6de19-b9d9-4add-a085-56884822ea36";
     
-    // Send simplified payload with 3 separate values
+    // Send payload with 4 separate values as requested
     const payload = {
-      CustomerName: `${data.first_name || ''} ${data.last_name || ''}`.trim(),
+      Day: `Day ${data.message_sequence_id || 0}`,
       Recipient: data.recipient_email || data.recipient_phone || '',
-      MessageType: data.message_type || ''
+      "Message Type": data.message_type || '',
+      "Message Body": data.content || ''
     };
 
     console.log('Sending webhook to n8n:', payload);

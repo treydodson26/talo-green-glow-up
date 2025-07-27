@@ -14,7 +14,7 @@ serve(async (req) => {
   try {
     const { eventType, data, tableName } = await req.json();
     
-    const webhookUrl = "https://treydodson26.app.n8n.cloud/webhook-test/24d78e00-12df-4664-83f8-5477b75e2b6c/webhook";
+    const webhookUrl = "https://treydodson26.app.n8n.cloud/webhook/3cf6de19-b9d9-4add-a085-56884822ea36";
     
     const payload = {
       eventType, // 'INSERT', 'UPDATE', 'DELETE'

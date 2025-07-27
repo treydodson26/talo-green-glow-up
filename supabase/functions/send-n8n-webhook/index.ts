@@ -16,12 +16,11 @@ serve(async (req) => {
     
     const webhookUrl = "https://treydodson26.app.n8n.cloud/webhook-test/3cf6de19-b9d9-4add-a085-56884822ea36";
     
+    // Send simplified payload with 3 separate values
     const payload = {
-      eventType, // 'INSERT', 'UPDATE', 'DELETE'
-      tableName,
-      data,
-      timestamp: new Date().toISOString(),
-      source: 'crm-app'
+      CustomerName: `${data.first_name || ''} ${data.last_name || ''}`.trim(),
+      Recipient: data.recipient_email || data.recipient_phone || '',
+      MessageType: data.message_type || ''
     };
 
     console.log('Sending webhook to n8n:', payload);

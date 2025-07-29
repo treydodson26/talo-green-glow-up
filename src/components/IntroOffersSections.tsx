@@ -168,7 +168,7 @@ const IntroOffersSections = () => {
       setSentMessages(prev => new Set([...prev, `${messageKey}-loading`]));
 
       // Send webhook for all messages with consistent payload structure
-      const webhookUrl = "https://treydodson26.app.n8n.cloud/webhook-test/3cf6de19-b9d9-4add-a085-56884822ea36";
+      const webhookUrl = "https://treydodson26.app.n8n.cloud/webhook/3cf6de19-b9d9-4add-a085-56884822ea36";
       
       // Create template ID mapping for different days
       const getTemplateId = (day: number, messageType: string) => {

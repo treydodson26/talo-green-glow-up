@@ -270,27 +270,27 @@ const IntroOffersSections = () => {
     );
   }
 
-  // Create demo data for each day - including Trey for demo purposes
+  // Create demo data for each day - using real customer IDs from database
   const demoCustomers = {
     0: [
-      { id: 1, first_name: 'Trey', last_name: 'Dodson', client_email: 'treydodson26@gmail.com', phone_number: '4697046880', current_day: 0, days_remaining: 30, intro_status: 'active', created_at: '2024-01-21', last_seen: '2024-01-21', tags: 'demo' },
-      { id: 10, first_name: 'Sarah', last_name: 'Johnson', client_email: 'sarah@example.com', phone_number: '+1234567891', current_day: 0, days_remaining: 30, intro_status: 'active', created_at: '2024-01-21', last_seen: '2024-01-21', tags: 'new' }
+      { id: 15, first_name: 'Chris', last_name: 'Schierholtz', client_email: 'chris@californiaradness.com', phone_number: '4697046880', current_day: 0, days_remaining: 30, intro_status: 'active', created_at: '2024-01-21', last_seen: '2024-01-21', tags: 'demo' },
+      { id: 14, first_name: 'Deborah', last_name: 'Claymon', client_email: 'deborahclaymon@gmail.com', phone_number: '+1234567891', current_day: 0, days_remaining: 30, intro_status: 'active', created_at: '2024-01-21', last_seen: '2024-01-21', tags: 'new' }
     ],
     7: [
-      { id: 2, first_name: 'Trey', last_name: 'Dodson', client_email: 'treydodson26@gmail.com', phone_number: '4697046880', current_day: 7, days_remaining: 23, intro_status: 'active', created_at: '2024-01-14', last_seen: '2024-01-20', tags: 'demo' },
-      { id: 11, first_name: 'Mike', last_name: 'Chen', client_email: 'mike@example.com', phone_number: '+1234567892', current_day: 7, days_remaining: 23, intro_status: 'active', created_at: '2024-01-14', last_seen: '2024-01-20', tags: 'engaged' }
+      { id: 13, first_name: 'Makena', last_name: 'Vincent-Comolli', client_email: 'makenacomolli@gmail.com', phone_number: '4697046880', current_day: 7, days_remaining: 23, intro_status: 'active', created_at: '2024-01-14', last_seen: '2024-01-20', tags: 'demo' },
+      { id: 12, first_name: 'Ally', last_name: 'Sparer', client_email: 'allysparer@gmail.com', phone_number: '+1234567892', current_day: 7, days_remaining: 23, intro_status: 'active', created_at: '2024-01-14', last_seen: '2024-01-20', tags: 'engaged' }
     ],
     10: [
-      { id: 3, first_name: 'Trey', last_name: 'Dodson', client_email: 'treydodson26@gmail.com', phone_number: '4697046880', current_day: 10, days_remaining: 20, intro_status: 'active', created_at: '2024-01-11', last_seen: '2024-01-20', tags: 'demo' },
-      { id: 12, first_name: 'Lisa', last_name: 'Williams', client_email: 'lisa@example.com', phone_number: '+1234567893', current_day: 10, days_remaining: 20, intro_status: 'active', created_at: '2024-01-11', last_seen: '2024-01-20', tags: 'regular' }
+      { id: 11, first_name: 'Diana', last_name: 'Lopez', client_email: 'dianamlopez53@gmail.com', phone_number: '4697046880', current_day: 10, days_remaining: 20, intro_status: 'active', created_at: '2024-01-11', last_seen: '2024-01-20', tags: 'demo' },
+      { id: 10, first_name: 'Lexi', last_name: 'Howe', client_email: 'howelexi@yahoo.com', phone_number: '+1234567893', current_day: 10, days_remaining: 20, intro_status: 'active', created_at: '2024-01-11', last_seen: '2024-01-20', tags: 'regular' }
     ],
     14: [
-      { id: 4, first_name: 'Trey', last_name: 'Dodson', client_email: 'treydodson26@gmail.com', phone_number: '4697046880', current_day: 14, days_remaining: 16, intro_status: 'active', created_at: '2024-01-07', last_seen: '2024-01-19', tags: 'demo' },
-      { id: 13, first_name: 'David', last_name: 'Brown', client_email: 'david@example.com', phone_number: '+1234567894', current_day: 14, days_remaining: 16, intro_status: 'active', created_at: '2024-01-07', last_seen: '2024-01-19', tags: 'consistent' }
+      { id: 9, first_name: 'Lisa', last_name: 'Brigandi', client_email: 'lisa.brigandi13@gmail.com', phone_number: '4697046880', current_day: 14, days_remaining: 16, intro_status: 'active', created_at: '2024-01-07', last_seen: '2024-01-19', tags: 'demo' },
+      { id: 8, first_name: 'Lindsey', last_name: 'Collison', client_email: 'lindseyt97@gmail.com', phone_number: '+1234567894', current_day: 14, days_remaining: 16, intro_status: 'active', created_at: '2024-01-07', last_seen: '2024-01-19', tags: 'consistent' }
     ],
     28: [
-      { id: 5, first_name: 'Trey', last_name: 'Dodson', client_email: 'treydodson26@gmail.com', phone_number: '4697046880', current_day: 28, days_remaining: 2, intro_status: 'active', created_at: '2023-12-24', last_seen: '2024-01-18', tags: 'demo' },
-      { id: 14, first_name: 'Emily', last_name: 'Studio', client_email: 'emily@example.com', phone_number: '+1234567895', current_day: 28, days_remaining: 2, intro_status: 'active', created_at: '2023-12-24', last_seen: '2024-01-18', tags: 'convert-ready' }
+      { id: 7, first_name: 'Erin', last_name: 'Daly', client_email: 'nire1of6@gmail.com', phone_number: '4697046880', current_day: 28, days_remaining: 2, intro_status: 'active', created_at: '2023-12-24', last_seen: '2024-01-18', tags: 'demo' },
+      { id: 6, first_name: 'Jodie', last_name: 'Ortiz', client_email: 'lil.jortiz0922@gmail.com', phone_number: '+1234567895', current_day: 28, days_remaining: 2, intro_status: 'active', created_at: '2023-12-24', last_seen: '2024-01-18', tags: 'convert-ready' }
     ]
   };
 

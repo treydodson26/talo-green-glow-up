@@ -167,7 +167,52 @@ const IntroOffersSections = () => {
       // Show loading state
       setSentMessages(prev => new Set([...prev, `${messageKey}-loading`]));
 
-      // Database trigger will automatically send webhook when we insert into communications_log
+      // If this is an email for Day 0, send the new webhook payload
+      if (messageData.messageType === 'email' && selectedTemplate?.day === 0) {
+        const webhookUrl = "https://treydodson26.app.n8n.cloud/webhook/3cf6de19-b9d9-4add-a085-56884822ea36";
+        
+        const payload = {
+          workflowType: "onboarding_communication",
+          sequenceDay: 0,
+          messageType: "email",
+          recipient: {
+            email: selectedCustomer?.client_email,
+            firstName: selectedCustomer?.first_name,
+            customerId: selectedCustomer?.id
+          },
+          content: {
+            subject: "Welcome to Talo Yoga🌿",
+            templateId: "intro_welcome",
+            variables: {
+              bookingLink: `https://example.com/book/${selectedCustomer?.id}` // You can customize this
+            }
+          },
+          metadata: {
+            sentBy: "system", // You can get actual user ID if available
+            sentAt: new Date().toISOString(),
+            source: "intro_customers_tab"
+          }
+        };
+
+        try {
+          const response = await fetch(webhookUrl, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(payload),
+          });
+
+          if (!response.ok) {
+            throw new Error(`Webhook failed: ${response.status}`);
+          }
+          
+          console.log('Webhook sent successfully to N8N');
+        } catch (webhookError) {
+          console.error('Error sending webhook:', webhookError);
+          // Don't fail the entire operation if webhook fails
+        }
+      }
 
       // Log the communication to database for inbox display
       await supabase

@@ -134,12 +134,6 @@ const MessageModal = ({
     <div style="padding: 30px;">
       <p style="margin: 0 0 16px 0; font-size: 16px;">${htmlContent}</p>
     </div>
-    <div style="background-color: #f8f9fa; padding: 20px; border-top: 1px solid #e9ecef; text-align: center;">
-      <p style="margin: 0; font-size: 14px; color: #6c757d;">
-        Best regards,<br>
-        <strong>Talo Yoga</strong>
-      </p>
-    </div>
   </div>
 </body>
 </html>`;

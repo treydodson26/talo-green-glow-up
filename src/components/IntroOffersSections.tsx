@@ -182,6 +182,7 @@ const IntroOffersSections = () => {
           },
           content: {
             subject: "Welcome to Talo Yoga🌿",
+            body: messageData.content,
             templateId: "intro_welcome",
             variables: {
               bookingLink: `https://example.com/book/${selectedCustomer?.id}` // You can customize this

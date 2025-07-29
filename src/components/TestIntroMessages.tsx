@@ -81,8 +81,7 @@ In the meantime, here's a few helpful tips:
 Thanks for being here. We're so happy you've found us.
 
 Warmly,
-Emily
-Founder, Talo Yoga`
+Emily & the Talo Yoga team`
     },
     {
       id: 9,
@@ -107,8 +106,7 @@ But everyone's needs are different, and I'd love to help you land on what feels 
 See you on the mat soon! 
 
 Warmly,
-Emily
-Founder, Talo Yoga`
+Emily & the Talo Yoga team`
     }
   ];
 

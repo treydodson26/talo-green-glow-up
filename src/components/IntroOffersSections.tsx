@@ -169,7 +169,7 @@ const IntroOffersSections = () => {
 
       // If this is an email for Day 0, send the new webhook payload
       if (messageData.messageType === 'email' && selectedTemplate?.day === 0) {
-        const webhookUrl = "https://treydodson26.app.n8n.cloud/webhook/3cf6de19-b9d9-4add-a085-56884822ea36";
+        const webhookUrl = "https://treydodson26.app.n8n.cloud/webhook-test/3cf6de19-b9d9-4add-a085-56884822ea36";
         
         const payload = {
           workflowType: "onboarding_communication",

@@ -167,52 +167,69 @@ const IntroOffersSections = () => {
       // Show loading state
       setSentMessages(prev => new Set([...prev, `${messageKey}-loading`]));
 
-      // If this is an email for Day 0, send the new webhook payload
-      if (messageData.messageType === 'email' && selectedTemplate?.day === 0) {
-        const webhookUrl = "https://treydodson26.app.n8n.cloud/webhook-test/3cf6de19-b9d9-4add-a085-56884822ea36";
-        
-        const payload = {
-          workflowType: "onboarding_communication",
-          sequenceDay: 0,
-          messageType: "email",
-          recipient: {
-            email: selectedCustomer?.client_email,
-            firstName: selectedCustomer?.first_name,
-            customerId: selectedCustomer?.id
-          },
-          content: {
-            subject: "Welcome to Talo Yoga🌿",
-            body: messageData.content.replace(/\{\{first_name\}\}/g, selectedCustomer?.first_name || ''),
-            templateId: "intro_welcome",
-            variables: {
-              bookingLink: `https://example.com/book/${selectedCustomer?.id}` // You can customize this
-            }
-          },
-          metadata: {
-            sentBy: "system", // You can get actual user ID if available
-            sentAt: new Date().toISOString(),
-            source: "intro_customers_tab"
+      // Send webhook for all messages with consistent payload structure
+      const webhookUrl = "https://treydodson26.app.n8n.cloud/webhook-test/3cf6de19-b9d9-4add-a085-56884822ea36";
+      
+      // Create template ID mapping for different days
+      const getTemplateId = (day: number, messageType: string) => {
+        if (messageType === 'email') {
+          switch (day) {
+            case 0: return 'intro_welcome';
+            case 7: return 'intro_check_in';
+            case 10: return 'intro_about_talo';
+            case 14: return 'intro_halfway';
+            case 28: return 'intro_conversion';
+            default: return `intro_day_${day}`;
           }
-        };
-
-        try {
-          const response = await fetch(webhookUrl, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(payload),
-          });
-
-          if (!response.ok) {
-            throw new Error(`Webhook failed: ${response.status}`);
-          }
-          
-          console.log('Webhook sent successfully to N8N');
-        } catch (webhookError) {
-          console.error('Error sending webhook:', webhookError);
-          // Don't fail the entire operation if webhook fails
         }
+        return `text_day_${day}`;
+      };
+      
+      const payload = {
+        workflowType: "onboarding_communication",
+        sequenceDay: selectedTemplate?.day || 0,
+        messageType: messageData.messageType,
+        recipient: {
+          email: selectedCustomer?.client_email,
+          firstName: selectedCustomer?.first_name,
+          customerId: selectedCustomer?.id,
+          phone: selectedCustomer?.phone_number
+        },
+        content: {
+          subject: messageData.subject || selectedTemplate?.subject || '',
+          body: messageData.content,
+          templateId: getTemplateId(selectedTemplate?.day || 0, messageData.messageType),
+          variables: {
+            bookingLink: `https://app.arketa.com/book/${selectedCustomer?.id}`,
+            firstName: selectedCustomer?.first_name,
+            studioName: "Talo Yoga"
+          }
+        },
+        metadata: {
+          sentBy: "system",
+          sentAt: new Date().toISOString(),
+          source: "intro_customers_tab",
+          messageSequenceId: selectedTemplate?.id
+        }
+      };
+
+      try {
+        const response = await fetch(webhookUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(payload),
+        });
+
+        if (!response.ok) {
+          throw new Error(`Webhook failed: ${response.status}`);
+        }
+        
+        console.log('Webhook sent successfully to N8N');
+      } catch (webhookError) {
+        console.error('Error sending webhook:', webhookError);
+        // Don't fail the entire operation if webhook fails
       }
 
       // Log the communication to database for inbox display

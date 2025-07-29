@@ -46,11 +46,13 @@ const MessageModal = ({
   const [sending, setSending] = useState(false);
   const [activeTab, setActiveTab] = useState<'compose' | 'preview'>('compose');
 
-  // Reset form when template changes
+  // Reset form when template changes and process template variables
   useEffect(() => {
-    setSubject(template?.subject || '');
-    setContent(template?.content || '');
-  }, [template]);
+    const processedSubject = template?.subject ? processTemplate(template.subject) : '';
+    const processedContent = template?.content ? processTemplate(template.content) : '';
+    setSubject(processedSubject);
+    setContent(processedContent);
+  }, [template, customer.first_name, customer.last_name]);
 
   // Handle escape key to close modal
   useEffect(() => {

@@ -6,7 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { Mail, Phone, Send, Loader2, X } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Mail, Phone, Send, Loader2, X, Bold, Italic, Link2, Eye } from "lucide-react";
 
 interface MessageModalProps {
   isOpen: boolean;
@@ -43,6 +44,7 @@ const MessageModal = ({
   const [subject, setSubject] = useState(template?.subject || '');
   const [content, setContent] = useState(template?.content || '');
   const [sending, setSending] = useState(false);
+  const [activeTab, setActiveTab] = useState<'compose' | 'preview'>('compose');
 
   // Reset form when template changes
   useEffect(() => {
@@ -80,7 +82,7 @@ const MessageModal = ({
         customerId: customer.id,
         messageType,
         subject: messageType === 'email' ? subject : undefined,
-        content,
+        content: messageType === 'email' ? formatForEmail(content) : content,
         recipient
       });
       
@@ -102,6 +104,81 @@ const MessageModal = ({
 
   const previewContent = processTemplate(content);
   const previewSubject = processTemplate(subject);
+
+  // Convert plain text to Gmail-friendly HTML
+  const convertToHtml = (text: string) => {
+    return text
+      .replace(/\n\n/g, '</p><p>')
+      .replace(/\n/g, '<br>')
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.*?)\*/g, '<em>$1</em>')
+      .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" style="color: #1a73e8; text-decoration: none;">$1</a>');
+  };
+
+  const formatForEmail = (text: string) => {
+    const processedText = processTemplate(text);
+    const htmlContent = convertToHtml(processedText);
+    
+    return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${processTemplate(subject)}</title>
+</head>
+<body style="margin: 0; padding: 20px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; background-color: #f8f9fa;">
+  <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); overflow: hidden;">
+    <div style="padding: 30px;">
+      <p style="margin: 0 0 16px 0; font-size: 16px;">${htmlContent}</p>
+    </div>
+    <div style="background-color: #f8f9fa; padding: 20px; border-top: 1px solid #e9ecef; text-align: center;">
+      <p style="margin: 0; font-size: 14px; color: #6c757d;">
+        Best regards,<br>
+        <strong>Talo Yoga</strong>
+      </p>
+    </div>
+  </div>
+</body>
+</html>`;
+  };
+
+  const insertFormatting = (format: 'bold' | 'italic' | 'link') => {
+    const textarea = document.getElementById('content') as HTMLTextAreaElement;
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selectedText = content.substring(start, end);
+    
+    let replacement = '';
+    let cursorOffset = 0;
+
+    switch (format) {
+      case 'bold':
+        replacement = `**${selectedText}**`;
+        cursorOffset = selectedText ? 0 : 2;
+        break;
+      case 'italic':
+        replacement = `*${selectedText}*`;
+        cursorOffset = selectedText ? 0 : 1;
+        break;
+      case 'link':
+        replacement = `[${selectedText || 'link text'}](https://example.com)`;
+        cursorOffset = selectedText ? 0 : -19;
+        break;
+    }
+
+    const newContent = content.substring(0, start) + replacement + content.substring(end);
+    setContent(newContent);
+
+    // Set cursor position after formatting
+    setTimeout(() => {
+      textarea.focus();
+      const newCursorPos = start + replacement.length + cursorOffset;
+      textarea.setSelectionRange(newCursorPos, newCursorPos);
+    }, 0);
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -225,18 +302,100 @@ const MessageModal = ({
                 {messageType === 'email' ? 'Email Content' : 'Message Content'}
               </Label>
               <p className="text-sm text-slate-600 mt-1">
-                Craft your message using the available template variables
+                {messageType === 'email' 
+                  ? 'Craft your email with formatting options for professional Gmail delivery'
+                  : 'Craft your message using the available template variables'
+                }
               </p>
             </div>
-            
-            <Textarea
-              id="content"
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              placeholder={`Write your ${messageType === 'email' ? 'email' : 'text'} message here...`}
-              rows={messageType === 'email' ? 10 : 6}
-              className="text-base leading-relaxed py-4 px-4 border-2 focus:border-green-500 transition-colors resize-none"
-            />
+
+            {messageType === 'email' ? (
+              <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'compose' | 'preview')}>
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="compose">Compose</TabsTrigger>
+                  <TabsTrigger value="preview" className="flex items-center gap-2">
+                    <Eye className="w-4 h-4" />
+                    Gmail Preview
+                  </TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="compose" className="space-y-4">
+                  {/* Formatting Toolbar */}
+                  <div className="flex items-center gap-2 p-3 bg-slate-50 border rounded-lg">
+                    <span className="text-sm font-medium text-slate-600 mr-2">Format:</span>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => insertFormatting('bold')}
+                      className="h-8 px-3"
+                    >
+                      <Bold className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => insertFormatting('italic')}
+                      className="h-8 px-3"
+                    >
+                      <Italic className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => insertFormatting('link')}
+                      className="h-8 px-3"
+                    >
+                      <Link2 className="w-4 h-4" />
+                    </Button>
+                    <div className="ml-4 text-xs text-slate-500">
+                      Use **bold**, *italic*, or [link text](url)
+                    </div>
+                  </div>
+
+                  <Textarea
+                    id="content"
+                    value={content}
+                    onChange={(e) => setContent(e.target.value)}
+                    placeholder="Write your email message here...
+
+**Bold text** for emphasis
+*Italic text* for style  
+[Link text](https://example.com) for links
+
+Use {{first_name}} for personalization"
+                    rows={12}
+                    className="text-base leading-relaxed py-4 px-4 border-2 focus:border-green-500 transition-colors resize-none font-mono"
+                  />
+                </TabsContent>
+
+                <TabsContent value="preview" className="space-y-4">
+                  <div className="bg-white border-2 border-slate-200 rounded-lg overflow-hidden">
+                    <div className="bg-slate-100 px-4 py-2 border-b">
+                      <div className="text-sm font-medium text-slate-700">Gmail Preview</div>
+                      <div className="text-xs text-slate-500">How your email will appear to {customer.first_name}</div>
+                    </div>
+                    <div 
+                      className="p-6 min-h-[300px]"
+                      dangerouslySetInnerHTML={{ 
+                        __html: formatForEmail(content) 
+                      }}
+                    />
+                  </div>
+                </TabsContent>
+              </Tabs>
+            ) : (
+              <Textarea
+                id="content"
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                placeholder="Write your text message here..."
+                rows={6}
+                className="text-base leading-relaxed py-4 px-4 border-2 focus:border-green-500 transition-colors resize-none"
+              />
+            )}
             
             {/* Template Variables Help */}
             <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
@@ -257,8 +416,8 @@ const MessageModal = ({
               </div>
             </div>
 
-            {/* Message Preview */}
-            {previewContent && previewContent !== content && (
+            {/* Simple Message Preview for Text Messages */}
+            {messageType === 'text' && previewContent && previewContent !== content && (
               <div className="bg-green-50 border border-green-200 rounded-lg p-5">
                 <div className="flex items-center gap-2 mb-4">
                   <div className="w-2 h-2 bg-green-500 rounded-full"></div>

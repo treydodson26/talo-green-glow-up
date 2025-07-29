@@ -182,7 +182,7 @@ const IntroOffersSections = () => {
           },
           content: {
             subject: "Welcome to Talo Yoga🌿",
-            body: messageData.content,
+            body: messageData.content.replace(/\{\{first_name\}\}/g, selectedCustomer?.first_name || ''),
             templateId: "intro_welcome",
             variables: {
               bookingLink: `https://example.com/book/${selectedCustomer?.id}` // You can customize this

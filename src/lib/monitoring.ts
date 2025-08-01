@@ -1,4 +1,5 @@
 // Production Monitoring and Performance Tracking
+import React from 'react';
 import { config } from './config';
 
 interface PerformanceMetric {
@@ -124,7 +125,7 @@ class MonitoringService {
       const fidObserver = new PerformanceObserver((list) => {
         const entries = list.getEntries();
         entries.forEach((entry) => {
-          this.trackPerformance('fid', entry.processingStart - entry.startTime);
+          this.trackPerformance('fid', (entry as any).processingStart - entry.startTime);
         });
       });
 

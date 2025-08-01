@@ -23,7 +23,7 @@ import { useToast } from "@/hooks/use-toast";
 import IntroOffersSections from "@/components/IntroOffersSections";
 import WhatsAppMessaging from "@/components/WhatsAppMessaging";
 import AddCustomerDialog from "@/components/AddCustomerDialog";
-
+import CSVImportDialog from "@/components/CSVImportDialog";
 import MessageModal from "@/components/MessageModal";
 
 interface Customer {
@@ -51,6 +51,7 @@ const ClientsTable = () => {
   const [showAllIntroOffers, setShowAllIntroOffers] = useState(false);
   const [activeTab, setActiveTab] = useState("clients");
   const [showAddDialog, setShowAddDialog] = useState(false);
+  const [showImportDialog, setShowImportDialog] = useState(false);
   const [messageModal, setMessageModal] = useState<{
     isOpen: boolean;
     customer: Customer | null;
@@ -323,13 +324,8 @@ const ClientsTable = () => {
               }}>
                 Export
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => {
-                toast({
-                  title: "Import Data",
-                  description: "Import functionality will be implemented soon.",
-                });
-              }}>
-                Import
+              <DropdownMenuItem onClick={() => setShowImportDialog(true)}>
+                Import from CSV
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -611,6 +607,13 @@ const ClientsTable = () => {
         open={showAddDialog}
         onOpenChange={setShowAddDialog}
         onCustomerAdded={handleCustomerAdded}
+      />
+
+      {/* CSV Import Dialog */}
+      <CSVImportDialog
+        isOpen={showImportDialog}
+        onClose={() => setShowImportDialog(false)}
+        onImportComplete={handleCustomerAdded}
       />
 
       {/* Message Modal */}

@@ -12,7 +12,7 @@ const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
     defaultOptions: {
       queries: {
         retry: false,
-        cacheTime: 0,
+        gcTime: 0,
       },
       mutations: {
         retry: false,
@@ -86,7 +86,7 @@ export const waitForLoadingToFinish = () =>
 
 export const mockConsoleError = () => {
   const originalError = console.error;
-  console.error = vi.fn();
+  console.error = (() => {}) as any;
   return () => {
     console.error = originalError;
   };
@@ -94,7 +94,7 @@ export const mockConsoleError = () => {
 
 export const mockConsoleWarn = () => {
   const originalWarn = console.warn;
-  console.warn = vi.fn();
+  console.warn = (() => {}) as any;
   return () => {
     console.warn = originalWarn;
   };

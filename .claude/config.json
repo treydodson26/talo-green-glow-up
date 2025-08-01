@@ -1,0 +1,205 @@
+{
+  "mcpServers": {
+    "google-docs-mcp": {
+      "command": "node",
+      "args": [
+        "/Users/treydodson/mcp-googledocs-server/dist/server.js"
+      ],
+      "env": {}
+    },
+    "mcp-server-firecrawl": {
+      "command": "npx",
+      "args": ["-y", "firecrawl-mcp"],
+      "env": {
+        "FIRECRAWL_API_KEY": "fc-94b7c38cfdbb4acea3d9dfe08d790dc6"
+      }
+    },
+    "claude-code": {
+      "command": "claude",
+      "args": ["mcp", "serve"],
+      "env": {}
+    },
+    "tavily-mcp": {
+      "command": "npx",
+      "args": ["-y", "tavily-mcp@0.1.2"],
+      "env": {
+        "TAVILY_API_KEY": "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"
+      }
+    },
+    "ElevenLabs": {
+      "command": "/Users/treydodson/.local/bin/uvx",
+      "args": [
+        "elevenlabs-mcp"
+      ],
+      "env": {
+        "ELEVENLABS_API_KEY": "sk_66f5e4a6f1662b0069d4f8c4c74ea070e3bd44c2bc72d574"
+      }
+    },
+    "n8n": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "supergateway",
+        "--sse",
+        "https://treydodson26.app.n8n.cloud/mcp/2dc7d8af-7f44-4fde-8656-0c2fa20e0fbc/sse"
+      ]
+    },
+    "n8n-mcp": {
+      "command": "npx",
+      "args": ["n8n-mcp"],
+      "env": {
+        "MCP_MODE": "stdio",
+        "LOG_LEVEL": "error",
+        "DISABLE_CONSOLE_OUTPUT": "true",
+        "N8N_API_URL": "https://treydodson26.app.n8n.cloud",
+        "N8N_API_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjNTA5NDNmZC03NGUyLTQzNDYtYmZmNS01NjIxZTNjMTI2ZDQiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwiaWF0IjoxNzQ4ODE0NTEyfQ.HQTp6ZrMhUXHP751BdqSlEymlcof3-Y9NCwhSWcI6AI"
+      }
+    },
+    "filesystem": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "/Users/treydodson/Desktop",
+        "/Users/treydodson/Downloads"
+      ]
+    },
+    "puppeteer": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-puppeteer"
+      ]
+    },
+    "brave-search": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-brave-search"
+      ],
+      "env": {
+        "BRAVE_API_KEY": "BSAcpUNLG-XrGdo7CJTmooUqP21tV_X"
+      }
+    },
+    "google-maps": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-google-maps"
+      ],
+      "env": {
+        "GOOGLE_MAPS_API_KEY": "AIzaSyDG9uNv9lG2rruYk6DOOr1JyX4pqYjyLP0"
+      }
+    },
+    "mcp-installer": {
+      "command": "npx",
+      "args": [
+        "@anaisbetts/mcp-installer"
+      ]
+    },
+    "calendar": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "supergateway",
+        "--sse",
+        "https://treydodson26.app.n8n.cloud/mcp/n8nMCP-calendar/sse"
+      ]
+    },
+    "gmail": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "supergateway",
+        "--sse",
+        "https://treydodson26.app.n8n.cloud/mcp/n8nMCP-Gmail/sse"
+      ]
+    },
+    "airtable": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "supergateway",
+        "--sse",
+        "https://treydodson26.app.n8n.cloud/mcp/n8nMCP-CRM/sse"
+      ]
+    },
+    "google-docs-n8n": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "supergateway",
+        "--sse",
+        "https://treydodson26.app.n8n.cloud/mcp/n8nMCP-GoogleDocs/sse"
+      ]
+    },
+    "google-slides": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "supergateway",
+        "--sse",
+        "https://treydodson26.app.n8n.cloud/mcp/n8nMCP-GoogleSlides/sse"
+      ]
+    },
+    "supabase": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@supabase/mcp-server-supabase@latest",
+        "--access-token",
+        "sbp_3c1850020622ad4c19d9f2393be8cdea6b2b41e1"
+      ]
+    },
+    "n8n-workflow": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "supergateway",
+        "--sse",
+        "https://treydodson26.app.n8n.cloud/mcp/2e368dda-6841-4bf4-80e2-c9a7bfa9abd5/sse"
+      ]
+    },
+    "pinecone": {
+      "command": "npx",
+      "args": [
+        "-y", "@pinecone-database/mcp"
+      ],
+      "env": {
+        "PINECONE_API_KEY": "pcsk_2vYiJt_ERui1PLu75LNBjwypxCTgvc11HrazemugKAEKEuKDExLJjZkEpWFcmZ93UN3qYE"
+      }
+    },
+    "github": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-github"
+      ],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_PERSONAL_ACCESS_TOKEN}"
+      }
+    },
+    "supabase-edge-functions": {
+      "command": "node",
+      "args": ["/Users/treydodson/Desktop/supabase-edge-functions-mcp/src/index.js"],
+      "env": {}
+    },
+    "youtube": {
+      "command": "npx",
+      "args": ["-y", "youtube-data-mcp-server"],
+      "env": {
+        "YOUTUBE_API_KEY": "AIzaSyBPJ_c04ft8ww-h3fvQ7CYbqtrqnUjAEf4",
+        "YOUTUBE_TRANSCRIPT_LANG": "ko"
+      }
+    },
+    "fireflies": {
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://api.fireflies.ai/mcp",
+        "--header",
+        "Authorization: Bearer a7674a0a-b7dd-4b2e-aebf-8a8a1199c192"
+      ]
+    }
+  }
+}

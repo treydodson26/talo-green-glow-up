@@ -11,6 +11,7 @@ export const IntroOffersPipeline = () => {
 
   // Calculate days since first class
   const getDaysSinceFirstClass = (firstClassDate: string) => {
+    if (!firstClassDate) return 0;
     const startDate = new Date(firstClassDate);
     const today = new Date();
     const diffTime = Math.abs(today.getTime() - startDate.getTime());

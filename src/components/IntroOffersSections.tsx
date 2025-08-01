@@ -14,11 +14,15 @@ interface Customer {
   client_email: string;
   phone_number: string;
   current_day: number;
-  days_remaining: number;
-  intro_status: string;
+  days_remaining?: number;
+  intro_status?: string;
   created_at: string;
   last_seen: string;
   tags: string;
+  // Additional fields from the customers table
+  first_class_date?: string;
+  intro_end_date?: string;
+  status?: string;
 }
 
 interface MessageSequence {
@@ -59,19 +63,41 @@ const IntroOffersSections = () => {
 
       if (sequencesError) throw sequencesError;
 
-      // Load intro offer customers
+      // Load intro customers from main customers table
       const { data: customers, error: customersError } = await supabase
-        .from('intro_offer_customers')
+        .from('customers')
         .select('*')
-        .order('current_day, last_name');
+        .eq('status', 'intro_trial')
+        .gte('intro_end_date', new Date().toISOString().split('T')[0])
+        .order('first_class_date');
 
       if (customersError) throw customersError;
 
-      // Group customers by their current day
+      // Group customers by their intro sequence touchpoints based on days since first class
       const grouped = customers?.reduce((acc, customer) => {
-        const day = customer.current_day || 0;
-        if (!acc[day]) acc[day] = [];
-        acc[day].push(customer);
+        const firstClassDate = new Date(customer.first_class_date);
+        const today = new Date();
+        const daysSinceFirst = Math.ceil((today.getTime() - firstClassDate.getTime()) / (1000 * 60 * 60 * 24));
+
+        // Group by intro sequence touchpoints (0, 7, 10, 14, 28)
+        let sequenceDay = 0;
+        if (daysSinceFirst >= 28) sequenceDay = 28;
+        else if (daysSinceFirst >= 14) sequenceDay = 14;
+        else if (daysSinceFirst >= 10) sequenceDay = 10;
+        else if (daysSinceFirst >= 7) sequenceDay = 7;
+
+        if (!acc[sequenceDay]) acc[sequenceDay] = [];
+        
+        // Calculate days remaining based on intro end date
+        const introEndDate = customer.intro_end_date ? new Date(customer.intro_end_date) : new Date();
+        const daysRemaining = Math.max(0, Math.ceil((introEndDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)));
+        
+        acc[sequenceDay].push({
+          ...customer, 
+          current_day: daysSinceFirst,
+          days_remaining: daysRemaining,
+          intro_status: customer.status || 'active'
+        });
         return acc;
       }, {} as { [key: number]: Customer[] }) || {};
 
@@ -287,29 +313,6 @@ const IntroOffersSections = () => {
     );
   }
 
-  // Create demo data for each day - using real customer IDs from database
-  const demoCustomers = {
-    0: [
-      { id: 15, first_name: 'Chris', last_name: 'Schierholtz', client_email: 'chris@californiaradness.com', phone_number: '4697046880', current_day: 0, days_remaining: 30, intro_status: 'active', created_at: '2024-01-21', last_seen: '2024-01-21', tags: 'demo' },
-      { id: 14, first_name: 'Deborah', last_name: 'Claymon', client_email: 'deborahclaymon@gmail.com', phone_number: '+1234567891', current_day: 0, days_remaining: 30, intro_status: 'active', created_at: '2024-01-21', last_seen: '2024-01-21', tags: 'new' }
-    ],
-    7: [
-      { id: 13, first_name: 'Makena', last_name: 'Vincent-Comolli', client_email: 'makenacomolli@gmail.com', phone_number: '4697046880', current_day: 7, days_remaining: 23, intro_status: 'active', created_at: '2024-01-14', last_seen: '2024-01-20', tags: 'demo' },
-      { id: 12, first_name: 'Ally', last_name: 'Sparer', client_email: 'allysparer@gmail.com', phone_number: '+1234567892', current_day: 7, days_remaining: 23, intro_status: 'active', created_at: '2024-01-14', last_seen: '2024-01-20', tags: 'engaged' }
-    ],
-    10: [
-      { id: 11, first_name: 'Diana', last_name: 'Lopez', client_email: 'dianamlopez53@gmail.com', phone_number: '4697046880', current_day: 10, days_remaining: 20, intro_status: 'active', created_at: '2024-01-11', last_seen: '2024-01-20', tags: 'demo' },
-      { id: 10, first_name: 'Lexi', last_name: 'Howe', client_email: 'howelexi@yahoo.com', phone_number: '+1234567893', current_day: 10, days_remaining: 20, intro_status: 'active', created_at: '2024-01-11', last_seen: '2024-01-20', tags: 'regular' }
-    ],
-    14: [
-      { id: 9, first_name: 'Lisa', last_name: 'Brigandi', client_email: 'lisa.brigandi13@gmail.com', phone_number: '4697046880', current_day: 14, days_remaining: 16, intro_status: 'active', created_at: '2024-01-07', last_seen: '2024-01-19', tags: 'demo' },
-      { id: 8, first_name: 'Lindsey', last_name: 'Collison', client_email: 'lindseyt97@gmail.com', phone_number: '+1234567894', current_day: 14, days_remaining: 16, intro_status: 'active', created_at: '2024-01-07', last_seen: '2024-01-19', tags: 'consistent' }
-    ],
-    28: [
-      { id: 7, first_name: 'Erin', last_name: 'Daly', client_email: 'nire1of6@gmail.com', phone_number: '4697046880', current_day: 28, days_remaining: 2, intro_status: 'active', created_at: '2023-12-24', last_seen: '2024-01-18', tags: 'demo' },
-      { id: 6, first_name: 'Jodie', last_name: 'Ortiz', client_email: 'lil.jortiz0922@gmail.com', phone_number: '+1234567895', current_day: 28, days_remaining: 2, intro_status: 'active', created_at: '2023-12-24', last_seen: '2024-01-18', tags: 'convert-ready' }
-    ]
-  };
 
   return (
     <div className="flex-1 p-6 bg-gray-50">
@@ -322,7 +325,7 @@ const IntroOffersSections = () => {
 
       <div className="space-y-6">
         {messageSequences.map((sequence) => {
-          const customers = demoCustomers[sequence.day] || [];
+          const customers = customersByDay[sequence.day] || [];
           
           return (
             <Card key={sequence.id} className="border-2 shadow-lg hover:shadow-xl transition-shadow duration-200">

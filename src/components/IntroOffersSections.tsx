@@ -170,13 +170,13 @@ const IntroOffersSections = () => {
       // Send webhook for all messages with consistent payload structure
       const webhookUrl = "https://treydodson26.app.n8n.cloud/webhook/3cf6de19-b9d9-4add-a085-56884822ea36";
       
-      // Create template ID mapping for different days
+      // Create template ID mapping for different days - Day 10 uses "studio_story"
       const getTemplateId = (day: number, messageType: string) => {
         if (messageType === 'email') {
           switch (day) {
             case 0: return 'intro_welcome';
             case 7: return 'intro_check_in';
-            case 10: return 'intro_about_talo';
+            case 10: return 'studio_story';
             case 14: return 'intro_halfway';
             case 28: return 'intro_conversion';
             default: return `intro_day_${day}`;
@@ -192,24 +192,19 @@ const IntroOffersSections = () => {
         recipient: {
           email: selectedCustomer?.client_email,
           firstName: selectedCustomer?.first_name,
-          customerId: selectedCustomer?.id,
-          phone: selectedCustomer?.phone_number
+          customerId: selectedCustomer?.id
         },
         content: {
           subject: messageData.subject || selectedTemplate?.subject || '',
-          body: messageData.content,
           templateId: getTemplateId(selectedTemplate?.day || 0, messageData.messageType),
           variables: {
-            bookingLink: `https://app.arketa.com/book/${selectedCustomer?.id}`,
-            firstName: selectedCustomer?.first_name,
-            studioName: "Talo Yoga"
+            bookingLink: `https://app.arketa.com/book/${selectedCustomer?.id}`
           }
         },
         metadata: {
           sentBy: "system",
           sentAt: new Date().toISOString(),
-          source: "intro_customers_tab",
-          messageSequenceId: selectedTemplate?.id
+          source: "intro_customers_tab"
         }
       };
 

@@ -17,7 +17,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Search, Filter, MoreHorizontal, Plus, ChevronDown, Phone, Mail, Loader2, MessageSquare, MessageCircle } from "lucide-react";
+import { Search, Filter, MoreHorizontal, Plus, ChevronDown, Phone, Mail, Loader2, MessageSquare, MessageCircle, Users } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import IntroOffersSections from "@/components/IntroOffersSections";
@@ -281,105 +281,121 @@ const ClientsTable = () => {
   };
 
   return (
-    <div className="flex-1 p-6 bg-background">
+    <div className="talo-container animate-fade-in">
       {/* Header */}
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h1 className="text-2xl font-semibold text-foreground mb-2">Customers Hub</h1>
-          <p className="text-muted-foreground">
-            Manage customers, intro offers, and communications
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="gap-2">
-                More <ChevronDown className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuItem onClick={() => {
-                toast({
-                  title: "Export Data",
-                  description: "Export functionality will be implemented soon.",
-                });
-              }}>
-                Export
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setShowImportDialog(true)}>
-                Import from CSV
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-          <Button 
-            className="bg-primary hover:bg-primary/90 gap-2"
-            onClick={() => setShowAddDialog(true)}
-          >
-            <Plus className="h-4 w-4" />
-            Add new
-          </Button>
+      <div className="talo-card-intimate mb-breath">
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-semibold text-foreground mb-2 talo-text-sage">Community Circle</h1>
+            <p className="talo-text-earth text-lg">
+              Nurture connections, guide journeys, and cultivate wisdom
+            </p>
+          </div>
+          <div className="flex gap-3">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="gap-2 border-primary/30 hover:border-primary transition-colors">
+                  More <ChevronDown className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="bg-card border-border shadow-intimate">
+                <DropdownMenuItem onClick={() => {
+                  toast({
+                    title: "Export Community Data",
+                    description: "Export functionality will be implemented soon.",
+                  });
+                }}>
+                  Export
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setShowImportDialog(true)}>
+                  Import from CSV
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <Button 
+              className="talo-button-sage gap-2 font-medium"
+              onClick={() => setShowAddDialog(true)}
+            >
+              <Plus className="h-4 w-4" />
+              Welcome New
+            </Button>
+          </div>
         </div>
       </div>
 
       {/* Tabs */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="clients" className="flex items-center gap-2">
-            <Plus className="w-4 h-4" />
-            All Clients ({totalCustomerCount > 0 ? totalCustomerCount.toLocaleString() : '968'})
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="talo-section">
+        <TabsList className="grid w-full grid-cols-3 bg-muted/30 p-1 rounded-lg">
+          <TabsTrigger 
+            value="clients" 
+            className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all duration-200"
+          >
+            <Users className="w-4 h-4" />
+            Community ({totalCustomerCount > 0 ? totalCustomerCount.toLocaleString() : '968'})
           </TabsTrigger>
-          <TabsTrigger value="intro-offers" className="flex items-center gap-2">
+          <TabsTrigger 
+            value="intro-offers" 
+            className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all duration-200"
+          >
             <Plus className="w-4 h-4" />
-            Intro Offers ({totalIntroOfferCount > 0 ? totalIntroOfferCount : '12'})
+            New Journeys ({totalIntroOfferCount > 0 ? totalIntroOfferCount : '12'})
           </TabsTrigger>
-          <TabsTrigger value="whatsapp" className="flex items-center gap-2">
-            <MessageSquare className="w-4 h-4" />
-            WhatsApp
+          <TabsTrigger 
+            value="whatsapp" 
+            className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all duration-200"
+          >
+            <MessageCircle className="w-4 h-4" />
+            Direct Connect
           </TabsTrigger>
         </TabsList>
 
         <TabsContent value="clients" className="space-y-4">
           {/* Filter Tabs */}
-          <div className="flex gap-4 mb-6 overflow-x-auto">
-            {filters.map((filter) => (
-              <Button
-                key={filter}
-                variant={activeFilter === filter ? "default" : "ghost"}
-                className={`whitespace-nowrap ${
-                  activeFilter === filter 
-                    ? "bg-primary text-primary-foreground" 
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-                onClick={() => setActiveFilter(filter)}
-              >
-                {filter}
-              </Button>
-            ))}
+          <div className="talo-card-intimate">
+            <div className="flex gap-3 overflow-x-auto pb-2">
+              {filters.map((filter) => (
+                <Button
+                  key={filter}
+                  variant={activeFilter === filter ? "default" : "ghost"}
+                  className={`whitespace-nowrap transition-all duration-200 ${
+                    activeFilter === filter 
+                      ? "talo-button-sage shadow-intimate" 
+                      : "text-muted-foreground hover:text-primary hover:bg-primary/5"
+                  }`}
+                  onClick={() => setActiveFilter(filter)}
+                >
+                  {filter}
+                </Button>
+              ))}
+            </div>
           </div>
 
           {/* Search and Filter */}
-          <div className="flex gap-4 mb-6">
-            <div className="relative flex-1 max-w-sm">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search all clients"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
+          <div className="talo-card-intimate">
+            <div className="flex gap-4">
+              <div className="relative flex-1 max-w-md">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-primary/60" />
+                <Input
+                  placeholder="Find community members..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-11 border-primary/20 focus:border-primary transition-colors h-11"
+                />
+              </div>
+              <Button 
+                variant="outline" 
+                size="icon"
+                className="border-primary/30 hover:border-primary hover:bg-primary/5 transition-colors h-11 w-11"
+                onClick={() => {
+                  toast({
+                    title: "Advanced Filters",
+                    description: "Enhanced filter options coming soon to help you find exactly who you're looking for.",
+                  });
+                }}
+              >
+                <Filter className="h-5 w-5" />
+              </Button>
             </div>
-            <Button 
-              variant="outline" 
-              size="icon"
-              onClick={() => {
-                toast({
-                  title: "Filter Options",
-                  description: "Advanced filter options will be implemented soon.",
-                });
-              }}
-            >
-              <Filter className="h-4 w-4" />
-            </Button>
           </div>
 
           {/* All Customers Summary - Only show when viewing All filter */}

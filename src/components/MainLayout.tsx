@@ -28,16 +28,20 @@ const MainLayout = () => {
         return <ClientsTable />;
       case "segments":
         return (
-          <div className="flex-1 p-6 bg-background">
-            <h1 className="text-2xl font-semibold">Segments</h1>
-            <p className="text-muted-foreground mt-2">Segments feature coming soon...</p>
+          <div className="talo-container">
+            <div className="talo-card-intimate">
+              <h1 className="text-2xl font-semibold talo-text-sage">Customer Segments</h1>
+              <p className="talo-text-earth mt-2">Discover natural patterns in your community...</p>
+            </div>
           </div>
         );
       case "comments":
         return (
-          <div className="flex-1 p-6 bg-background">
-            <h1 className="text-2xl font-semibold">Comments</h1>
-            <p className="text-muted-foreground mt-2">Comments feature coming soon...</p>
+          <div className="talo-container">
+            <div className="talo-card-intimate">
+              <h1 className="text-2xl font-semibold talo-text-sage">Community Voice</h1>
+              <p className="talo-text-earth mt-2">Listen to the wisdom of your students...</p>
+            </div>
           </div>
         );
       default:
@@ -51,7 +55,9 @@ const MainLayout = () => {
         <AppSidebar activeRoute={activeRoute} onRouteChange={setActiveRoute} />
         <div className="flex-1 flex flex-col">
           <TopBar />
-          {renderContent()}
+          <main className="flex-1 animate-fade-in">
+            {renderContent()}
+          </main>
         </div>
       </div>
     </SidebarProvider>

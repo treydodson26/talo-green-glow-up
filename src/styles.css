@@ -4,48 +4,74 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 98%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
-    --radius: 0.5rem;
+    /* Talo Brand Foundation - Warm, Natural, Intimate */
+    --background: 32 15% 97%;           /* Warm cream background */
+    --foreground: 160 15% 15%;          /* Deep sage-charcoal text */
+    --card: 30 20% 95%;                 /* Soft cream cards */
+    --card-foreground: 160 15% 15%;
+    --popover: 30 20% 95%;
+    --popover-foreground: 160 15% 15%;
+    
+    /* Primary - Soft Sage */
+    --primary: 150 25% 65%;             /* Soft sage green */
+    --primary-foreground: 30 20% 95%;
+    --primary-glow: 150 35% 75%;        /* Lighter sage for highlights */
+    
+    /* Secondary - Earth Tones */
+    --secondary: 35 25% 85%;            /* Warm beige */
+    --secondary-foreground: 160 15% 25%;
+    
+    /* Muted - Natural Neutrals */
+    --muted: 35 15% 90%;                /* Light natural beige */
+    --muted-foreground: 160 10% 45%;    /* Muted sage-gray */
+    
+    /* Accent - Deep Forest */
+    --accent: 155 30% 40%;              /* Deep forest green */
+    --accent-foreground: 30 20% 95%;
+    
+    /* Supporting Colors */
+    --destructive: 0 65% 55%;           /* Warm red */
+    --destructive-foreground: 30 20% 95%;
+    --border: 35 20% 88%;               /* Soft natural border */
+    --input: 35 20% 92%;                /* Input background */
+    --ring: 150 25% 65%;                /* Focus ring - primary */
+    
+    /* Brand-specific gradients and effects */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
+    --gradient-warm: linear-gradient(180deg, hsl(var(--background)), hsl(var(--muted)));
+    --shadow-natural: 0 4px 20px -2px hsl(var(--primary) / 0.1);
+    --shadow-intimate: 0 2px 12px -1px hsl(var(--accent) / 0.15);
+    
+    --radius: 0.75rem;                  /* Softer, more organic rounded corners */
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
+    /* Dark mode - maintaining warmth */
+    --background: 160 20% 8%;           /* Deep sage-charcoal */
+    --foreground: 30 15% 92%;           /* Warm light cream */
+    --card: 160 15% 12%;
+    --card-foreground: 30 15% 92%;
+    --popover: 160 15% 12%;
+    --popover-foreground: 30 15% 92%;
+    
+    --primary: 150 30% 70%;             /* Brighter sage in dark */
+    --primary-foreground: 160 20% 8%;
+    --primary-glow: 150 40% 80%;
+    
+    --secondary: 160 10% 20%;           /* Dark sage */
+    --secondary-foreground: 30 15% 85%;
+    
+    --muted: 160 8% 18%;
+    --muted-foreground: 35 10% 65%;
+    
+    --accent: 150 35% 60%;              /* Lighter forest in dark */
+    --accent-foreground: 160 20% 8%;
+    
+    --destructive: 0 60% 50%;
+    --destructive-foreground: 30 15% 92%;
+    --border: 160 10% 22%;
+    --input: 160 10% 18%;
+    --ring: 150 30% 70%;
   }
 }
 
@@ -57,5 +83,42 @@
   body {
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
+    font-family: 'Inter', system-ui, sans-serif;
+    line-height: 1.6;
+  }
+}
+
+/* Talo Brand Typography & Spacing */
+@layer components {
+  .talo-container {
+    @apply max-w-7xl mx-auto px-6 py-8;
+  }
+  
+  .talo-card {
+    @apply bg-card border border-border rounded-lg shadow-natural p-6 transition-all duration-300;
+  }
+  
+  .talo-card-intimate {
+    @apply bg-card border border-border rounded-lg shadow-intimate p-4 transition-all duration-300 hover:shadow-natural;
+  }
+  
+  .talo-button-sage {
+    @apply bg-primary text-primary-foreground hover:bg-primary/90 shadow-intimate transition-all duration-200 hover:shadow-natural;
+  }
+  
+  .talo-text-sage {
+    @apply text-primary font-medium;
+  }
+  
+  .talo-text-earth {
+    @apply text-secondary-foreground;
+  }
+  
+  .talo-section {
+    @apply space-y-6;
+  }
+  
+  .talo-rhythm {
+    @apply space-y-4;
   }
 }

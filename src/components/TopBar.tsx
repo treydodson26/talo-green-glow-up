@@ -5,7 +5,7 @@ import { Search, Plus, Bell, User } from "lucide-react";
 
 const TopBar = () => {
   return (
-    <div className="h-16 bg-background border-b border-border flex items-center justify-between px-6">
+    <div className="h-16 bg-card border-b border-border flex items-center justify-between px-6">
       {/* Left side - Sidebar trigger and Breadcrumb */}
       <div className="flex items-center gap-4">
         <SidebarTrigger />

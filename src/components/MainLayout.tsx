@@ -51,9 +51,9 @@ const MainLayout = () => {
 
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen w-full bg-background">
+      <div className="flex min-h-screen w-full bg-background-subtle">
         <AppSidebar activeRoute={activeRoute} onRouteChange={setActiveRoute} />
-        <div className="flex-1 flex flex-col">
+        <div className="flex-1 flex flex-col bg-background">
           <TopBar />
           <main className="flex-1 animate-fade-in">
             {renderContent()}

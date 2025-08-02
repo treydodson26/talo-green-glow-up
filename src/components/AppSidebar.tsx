@@ -62,8 +62,8 @@ export function AppSidebar({ activeRoute = "home", onRouteChange }: AppSidebarPr
   };
 
   return (
-    <Sidebar className="border-r border-border">
-      <SidebarHeader className="border-b border-border p-4">
+    <Sidebar className="border-r border-border bg-card-dark">
+      <SidebarHeader className="border-b border-border p-4 bg-background-subtle">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 bg-gradient-to-br from-green-400 to-blue-500 rounded-lg flex items-center justify-center flex-shrink-0">
             <span className="text-white font-bold text-sm">T</span>

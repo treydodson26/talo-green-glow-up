@@ -5,11 +5,13 @@
 @layer base {
   :root {
     /* Talo Brand Foundation - Warm, Natural, Intimate */
-    --background: 32 15% 97%;           /* Warm cream background */
+    --background: 32 15% 94%;           /* Slightly darker warm cream */
+    --background-subtle: 30 20% 92%;    /* Darker background for depth */
     --foreground: 160 15% 15%;          /* Deep sage-charcoal text */
-    --card: 30 20% 95%;                 /* Soft cream cards */
+    --card: 30 20% 97%;                 /* Lighter cards for contrast */
     --card-foreground: 160 15% 15%;
-    --popover: 30 20% 95%;
+    --card-dark: 32 18% 88%;            /* Darker card variant */
+    --popover: 30 20% 97%;
     --popover-foreground: 160 15% 15%;
     
     /* Primary - Soft Sage */
@@ -100,6 +102,10 @@
   
   .talo-card-intimate {
     @apply bg-card border border-border rounded-lg shadow-intimate p-4 transition-all duration-300 hover:shadow-natural;
+  }
+  
+  .talo-card-dark {
+    @apply bg-card-dark border border-border rounded-lg shadow-intimate p-4 transition-all duration-300 hover:shadow-natural;
   }
   
   .talo-button-sage {

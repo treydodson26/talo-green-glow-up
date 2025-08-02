@@ -85,49 +85,31 @@ const ClientsTable = () => {
         const thirtyDaysAgo = new Date();
         thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
         
-        // First, get the total count of customers in intro offer period
-        const { count: totalCount, error: countError } = await supabase
+        // Combine count and data in single query for better performance
+        const limit = showAllIntroOffers ? 1000 : 50; // Increased initial limit
+        const { data, error, count } = await supabase
           .from('customers')
-          .select('*', { count: 'exact', head: true })
-          .gte('first_seen', thirtyDaysAgo.toISOString())
-          .not('first_seen', 'is', null);
-
-        if (countError) throw countError;
-        setTotalIntroOfferCount(totalCount || 0);
-
-        // Then get the actual data
-        const limit = showAllIntroOffers ? undefined : 10;
-        let query = supabase
-          .from('customers')
-          .select('*')
+          .select('*', { count: 'exact' })
           .gte('first_seen', thirtyDaysAgo.toISOString())
           .not('first_seen', 'is', null)
-          .order('first_seen', { ascending: false });
-        
-        if (limit) {
-          query = query.limit(limit);
-        }
+          .order('first_seen', { ascending: false })
+          .limit(limit);
 
-        const { data, error } = await query;
         if (error) throw error;
+        setTotalIntroOfferCount(count || 0);
         setCustomers(data || []);
       } else {
-        // Get total count of all customers
-        const { count: totalCount, error: countError } = await supabase
+        // Optimize with pagination and single query
+        const limit = 100; // Add pagination limit
+        const { data: allCustomers, error: allError, count: totalCount } = await supabase
           .from('customers')
-          .select('*', { count: 'exact', head: true });
+          .select('*', { count: 'exact' })
+          .order('created_at', { ascending: false })
+          .limit(limit);
 
-        if (countError) throw countError;
+        if (allError) throw allError;
         setTotalCustomerCount(totalCount || 0);
-
-        // Get all customers from main customers table
-        const { data, error } = await supabase
-          .from('customers')
-          .select('*')
-          .order('created_at', { ascending: false });
-
-        if (error) throw error;
-        setCustomers(data || []);
+        setCustomers(allCustomers || []);
         setTotalIntroOfferCount(0); // Reset intro offer count for other filters
       }
     } catch (error: any) {

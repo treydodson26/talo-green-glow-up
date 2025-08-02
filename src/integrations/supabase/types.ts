@@ -14,6 +14,80 @@ export type Database = {
   }
   public: {
     Tables: {
+      bookings: {
+        Row: {
+          booking_date: string
+          booking_status: string
+          cancellation_reason: string | null
+          cancelled_at: string | null
+          checked_in_at: string | null
+          class_id: string
+          created_at: string
+          customer_id: number
+          id: string
+          is_waitlisted: boolean | null
+          updated_at: string
+          waitlist_position: number | null
+        }
+        Insert: {
+          booking_date?: string
+          booking_status?: string
+          cancellation_reason?: string | null
+          cancelled_at?: string | null
+          checked_in_at?: string | null
+          class_id: string
+          created_at?: string
+          customer_id: number
+          id?: string
+          is_waitlisted?: boolean | null
+          updated_at?: string
+          waitlist_position?: number | null
+        }
+        Update: {
+          booking_date?: string
+          booking_status?: string
+          cancellation_reason?: string | null
+          cancelled_at?: string | null
+          checked_in_at?: string | null
+          class_id?: string
+          created_at?: string
+          customer_id?: number
+          id?: string
+          is_waitlisted?: boolean | null
+          updated_at?: string
+          waitlist_position?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bookings_class_id_fkey"
+            columns: ["class_id"]
+            isOneToOne: false
+            referencedRelation: "classes_schedule"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bookings_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customer_engagement_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bookings_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bookings_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "intro_offer_customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       classes_schedule: {
         Row: {
           class_date: string
@@ -115,6 +189,13 @@ export type Database = {
           whatsapp_message_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "communications_log_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customer_engagement_stats"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "communications_log_customer_id_fkey"
             columns: ["customer_id"]
@@ -359,6 +440,27 @@ export type Database = {
       }
     }
     Views: {
+      customer_engagement_stats: {
+        Row: {
+          attendance_rate: number | null
+          cancellations: number | null
+          classes_attended: number | null
+          client_email: string | null
+          conversion_date: string | null
+          engagement_level: string | null
+          first_class_date: string | null
+          first_name: string | null
+          id: number | null
+          last_attended_date: string | null
+          last_booking_date: string | null
+          last_class_date: string | null
+          last_name: string | null
+          no_shows: number | null
+          status: string | null
+          total_bookings: number | null
+        }
+        Relationships: []
+      }
       customers_by_stage: {
         Row: {
           customer_count: number | null
@@ -371,8 +473,12 @@ export type Database = {
         Row: {
           active_intro_offers: number | null
           avg_capacity_today: number | null
+          bookings_this_week: number | null
           ending_this_week: number | null
+          intro_customers_never_attended: number | null
+          intro_customers_never_booked: number | null
           new_leads_week: number | null
+          no_shows_this_month: number | null
           revenue_last_month: number | null
           revenue_this_month: number | null
           todays_classes: number | null

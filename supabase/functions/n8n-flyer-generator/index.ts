@@ -65,13 +65,35 @@ serve(async (req) => {
 
     const data = await response.json();
     console.log('OpenAI response received successfully');
+    console.log('Response structure:', JSON.stringify(data, null, 2));
 
-    // gpt-image-1 returns base64 data directly
+    // Check if we have data array
+    if (!data.data || !Array.isArray(data.data) || data.data.length === 0) {
+      console.error('Invalid response structure:', data);
+      throw new Error('Invalid response structure from OpenAI');
+    }
+
     const imageData = data.data[0];
-    const base64Image = imageData.b64_json;
+    console.log('Image data keys:', Object.keys(imageData));
+    
+    // Handle both b64_json and url response formats
+    let base64Image;
+    if (imageData.b64_json) {
+      base64Image = imageData.b64_json;
+    } else if (imageData.url) {
+      // If we get a URL, we need to fetch it and convert to base64
+      console.log('Received URL, fetching image...');
+      const imageResponse = await fetch(imageData.url);
+      const arrayBuffer = await imageResponse.arrayBuffer();
+      const uint8Array = new Uint8Array(arrayBuffer);
+      base64Image = btoa(String.fromCharCode.apply(null, uint8Array));
+    } else {
+      console.error('No image data found in response:', imageData);
+      throw new Error('No image data received from OpenAI');
+    }
 
     if (!base64Image) {
-      throw new Error('No image data received from OpenAI');
+      throw new Error('Failed to get base64 image data');
     }
 
     return new Response(

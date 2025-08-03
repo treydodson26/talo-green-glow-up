@@ -79,7 +79,7 @@ const FlyerGenerator = () => {
       const newFlyer: GeneratedFlyer = {
         id: crypto.randomUUID(),
         prompt: prompt,
-        imageUrl: data.imageUrl,
+        imageUrl: data.imageData,
         createdAt: new Date().toISOString()
       };
 

@@ -111,10 +111,18 @@ serve(async (req) => {
   } catch (error: any) {
     console.error('Error in n8n-flyer-generator function:', error);
     
+    // Return detailed error information for debugging
     return new Response(
       JSON.stringify({ 
         error: error.message || 'Failed to generate flyer',
-        success: false 
+        success: false,
+        debug: {
+          errorName: error.name,
+          errorStack: error.stack,
+          timestamp: new Date().toISOString(),
+          hasOpenAIKey: !!Deno.env.get('OPENAI_API_KEY'),
+          keyLength: Deno.env.get('OPENAI_API_KEY')?.length || 0
+        }
       }),
       {
         status: 500,

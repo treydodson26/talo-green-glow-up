@@ -52,7 +52,7 @@ export const IntroOffersPipeline = () => {
       return {
         status: 'needs-attention',
         color: 'secondary',
-        bgClass: 'border-orange-200 bg-orange-50',
+        bgClass: 'border-accent/30 bg-accent/10',
         priority: 2,
         reason: `${daysSinceLastVisit} days since last visit`
       };
@@ -63,7 +63,7 @@ export const IntroOffersPipeline = () => {
       return {
         status: 'conversion-ready',
         color: 'default',
-        bgClass: 'border-blue-200 bg-blue-50',
+        bgClass: 'border-primary/30 bg-primary/10',
         priority: 3,
         reason: 'Ready for conversion conversation'
       };
@@ -73,7 +73,7 @@ export const IntroOffersPipeline = () => {
     return {
       status: 'on-track',
       color: 'default',
-      bgClass: 'border-green-200 bg-green-50',
+      bgClass: 'border-secondary/30 bg-secondary/10',
       priority: 4,
       reason: 'Coming regularly'
     };
@@ -144,7 +144,7 @@ export const IntroOffersPipeline = () => {
   };
 
   return (
-    <Card>
+    <Card className="talo-card">
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2">
@@ -170,8 +170,8 @@ export const IntroOffersPipeline = () => {
                 {React.createElement(groupIcon, { 
                   className: `h-4 w-4 ${
                     groupName === 'Red Alert' ? 'text-destructive' :
-                    groupName === 'High Priority' ? 'text-orange-500' :
-                    groupName === 'Medium Priority' ? 'text-blue-500' : 'text-green-500'
+                    groupName === 'High Priority' ? 'text-accent' :
+                    groupName === 'Medium Priority' ? 'text-primary' : 'text-secondary'
                   }` 
                 })}
                 <h3 className="font-medium text-sm">

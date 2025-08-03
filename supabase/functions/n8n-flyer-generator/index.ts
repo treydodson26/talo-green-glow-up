@@ -20,7 +20,11 @@ serve(async (req) => {
     const { prompt, title }: FlyerRequest = await req.json();
     const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
 
+    console.log('OpenAI API Key present:', !!openAIApiKey);
+    console.log('OpenAI API Key length:', openAIApiKey?.length || 0);
+
     if (!openAIApiKey) {
+      console.error('OPENAI_API_KEY is missing');
       throw new Error('OPENAI_API_KEY is not configured');
     }
 

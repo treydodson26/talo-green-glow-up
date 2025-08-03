@@ -18,46 +18,62 @@ serve(async (req) => {
 
   try {
     const { prompt, title }: FlyerRequest = await req.json();
+    const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
 
-    console.log('Calling n8n webhook with:', { prompt, title });
+    if (!openAIApiKey) {
+      throw new Error('OPENAI_API_KEY is not configured');
+    }
 
-    const N8N_WEBHOOK_URL = "https://treydodson26.app.n8n.cloud/webhook-test/3cf6de19-b9d9-4add-a085-56884822ea36";
-    
-    console.log('Using webhook URL:', N8N_WEBHOOK_URL);
+    console.log('Generating flyer with OpenAI:', { prompt, title });
 
-    // Call n8n webhook with detailed logging
-    console.log('Sending payload:', JSON.stringify({ prompt, title }, null, 2));
-    
-    const response = await fetch(N8N_WEBHOOK_URL, {
+    // Create a detailed prompt for flyer generation
+    const flyerPrompt = `Create a professional marketing flyer with the title "${title}". ${prompt}. 
+    Make it visually appealing with modern design, appropriate colors, and professional typography. 
+    Include space for contact information and make it suitable for a yoga studio or wellness business.`;
+
+    console.log('Sending request to OpenAI with prompt:', flyerPrompt);
+
+    // Call OpenAI Image Generation API
+    const response = await fetch('https://api.openai.com/v1/images/generations', {
       method: 'POST',
       headers: {
+        'Authorization': `Bearer ${openAIApiKey}`,
         'Content-Type': 'application/json',
-        'User-Agent': 'Supabase-Edge-Function/1.0'
       },
       body: JSON.stringify({
-        prompt: prompt,
-        title: title
+        model: 'gpt-image-1',
+        prompt: flyerPrompt,
+        n: 1,
+        size: '1024x1536', // Portrait orientation good for flyers
+        quality: 'high',
+        output_format: 'png'
       }),
     });
 
-    console.log('Response status:', response.status);
-    console.log('Response headers:', JSON.stringify(Object.fromEntries(response.headers.entries())));
-    
+    console.log('OpenAI response status:', response.status);
+
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error('n8n webhook error response:', errorText);
-      throw new Error(`n8n webhook failed: ${response.status} ${response.statusText} - ${errorText}`);
+      const errorData = await response.json();
+      console.error('OpenAI API error:', errorData);
+      throw new Error(`OpenAI API failed: ${response.status} - ${errorData.error?.message || 'Unknown error'}`);
     }
 
-    // Get the response from n8n (should be the Google Drive link)
-    const result = await response.text();
-    console.log('n8n webhook success response:', result);
+    const data = await response.json();
+    console.log('OpenAI response received successfully');
+
+    // gpt-image-1 returns base64 data directly
+    const imageData = data.data[0];
+    const base64Image = imageData.b64_json;
+
+    if (!base64Image) {
+      throw new Error('No image data received from OpenAI');
+    }
 
     return new Response(
       JSON.stringify({ 
         success: true,
-        imageUrl: result.trim(),
-        message: 'Flyer generated successfully'
+        imageData: `data:image/png;base64,${base64Image}`,
+        message: 'Flyer generated successfully with OpenAI'
       }),
       {
         status: 200,

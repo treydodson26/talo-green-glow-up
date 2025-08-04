@@ -8,6 +8,8 @@ import InboxPage from "@/components/InboxPage";
 import InstructorHub from "@/components/InstructorHub";
 import OperationsHub from "@/components/OperationsHub";
 import MarketingHub from "@/components/MarketingHub";
+import { ClassSchedulePage } from "@/components/schedule/ClassSchedulePage";
+import { MyBookingsPage } from "@/components/schedule/MyBookingsPage";
 
 const MainLayout = () => {
   const [activeRoute, setActiveRoute] = useState("customers");
@@ -26,6 +28,10 @@ const MainLayout = () => {
         return <InboxPage />;
       case "customers":
         return <ClientsTable />;
+      case "schedule":
+        return <ClassSchedulePage />;
+      case "my-bookings":
+        return <MyBookingsPage />;
       case "segments":
         return (
           <div className="talo-container">
@@ -39,7 +45,7 @@ const MainLayout = () => {
         return (
           <div className="talo-container">
             <div className="talo-card-intimate">
-              <h1 className="text-2xl font-semibold talo-text-sage">Community Voice</h1>
+              <h1 className="text-2xl font-semibent talo-text-sage">Community Voice</h1>
               <p className="talo-text-earth mt-2">Listen to the wisdom of your students...</p>
             </div>
           </div>

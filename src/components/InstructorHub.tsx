@@ -1,9 +1,34 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { CalendarDays, Users, Clock, TrendingUp, BookOpen, Video } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+import { CalendarDays, Users, Clock, TrendingUp, BookOpen, Video, UserCheck, AlertTriangle } from "lucide-react";
+import { format } from "date-fns";
+import { useInstructorMetrics, useUpcomingClasses } from "@/hooks/useInstructorData";
+import { CreateClassModal } from "@/components/instructor/CreateClassModal";
+import { ClassStudentModal } from "@/components/instructor/ClassStudentModal";
 
 const InstructorHub = () => {
+  // Default instructor - in a real app, this would come from auth context
+  const instructorName = "Default Instructor";
+  
+  const { data: metrics, isLoading: metricsLoading } = useInstructorMetrics(instructorName);
+  const { data: upcomingClasses, isLoading: classesLoading } = useUpcomingClasses(instructorName);
+
+  const getClassStatusColor = (classData: any) => {
+    if (classData.needs_substitute) return "bg-red-500";
+    if (classData.current_bookings >= classData.max_capacity) return "bg-orange-500";
+    if (classData.isToday) return "bg-green-500";
+    return "bg-blue-500";
+  };
+
+  const getCapacityBadgeVariant = (current: number, max: number) => {
+    const percentage = (current / max) * 100;
+    if (percentage >= 100) return "destructive";
+    if (percentage >= 80) return "secondary";
+    return "outline";
+  };
+
   return (
     <div className="flex-1 p-6 bg-background">
       <div className="max-w-7xl mx-auto">
@@ -21,8 +46,12 @@ const InstructorHub = () => {
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">127</div>
-              <p className="text-xs text-muted-foreground">+12% from last month</p>
+              {metricsLoading ? (
+                <Skeleton className="h-8 w-16" />
+              ) : (
+                <div className="text-2xl font-bold">{metrics?.totalStudents || 0}</div>
+              )}
+              <p className="text-xs text-muted-foreground">Active students</p>
             </CardContent>
           </Card>
 
@@ -32,19 +61,27 @@ const InstructorHub = () => {
               <CalendarDays className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">18</div>
-              <p className="text-xs text-muted-foreground">3 more than last week</p>
+              {metricsLoading ? (
+                <Skeleton className="h-8 w-16" />
+              ) : (
+                <div className="text-2xl font-bold">{metrics?.classesThisWeek || 0}</div>
+              )}
+              <p className="text-xs text-muted-foreground">Scheduled classes</p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Hours Taught</CardTitle>
+              <CardTitle className="text-sm font-medium">Hours This Week</CardTitle>
               <Clock className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">24.5</div>
-              <p className="text-xs text-muted-foreground">This week</p>
+              {metricsLoading ? (
+                <Skeleton className="h-8 w-16" />
+              ) : (
+                <div className="text-2xl font-bold">{metrics?.hoursThisWeek || 0}</div>
+              )}
+              <p className="text-xs text-muted-foreground">Teaching hours</p>
             </CardContent>
           </Card>
 
@@ -54,8 +91,12 @@ const InstructorHub = () => {
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">4.8</div>
-              <p className="text-xs text-muted-foreground">+0.2 from last month</p>
+              {metricsLoading ? (
+                <Skeleton className="h-8 w-16" />
+              ) : (
+                <div className="text-2xl font-bold">{metrics?.averageRating?.toFixed(1) || "N/A"}</div>
+              )}
+              <p className="text-xs text-muted-foreground">Student ratings</p>
             </CardContent>
           </Card>
         </div>
@@ -72,40 +113,54 @@ const InstructorHub = () => {
               <CardDescription>Your schedule for today and tomorrow</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between p-3 border border-border rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <div>
-                      <p className="font-medium">Yoga Flow - Beginner</p>
-                      <p className="text-sm text-muted-foreground">Today, 9:00 AM</p>
-                    </div>
-                  </div>
-                  <Badge variant="secondary">12 students</Badge>
+              {classesLoading ? (
+                <div className="space-y-4">
+                  {[1, 2, 3].map((i) => (
+                    <Skeleton key={i} className="h-16 w-full" />
+                  ))}
                 </div>
-                
-                <div className="flex items-center justify-between p-3 border border-border rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                    <div>
-                      <p className="font-medium">HIIT Training</p>
-                      <p className="text-sm text-muted-foreground">Today, 6:00 PM</p>
-                    </div>
-                  </div>
-                  <Badge variant="secondary">8 students</Badge>
+              ) : upcomingClasses && upcomingClasses.length > 0 ? (
+                <div className="space-y-4">
+                  {upcomingClasses.map((classItem) => (
+                    <ClassStudentModal key={classItem.id} classId={classItem.id}>
+                      <div className="flex items-center justify-between p-3 border border-border rounded-lg hover:bg-muted/50 cursor-pointer transition-colors">
+                        <div className="flex items-center gap-3">
+                          <div className={`w-2 h-2 rounded-full ${getClassStatusColor(classItem)}`}></div>
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <p className="font-medium">{classItem.class_name}</p>
+                              {classItem.needs_substitute && (
+                                <AlertTriangle className="h-4 w-4 text-red-500" />
+                              )}
+                            </div>
+                            <p className="text-sm text-muted-foreground">
+                              {classItem.isToday ? "Today" : "Tomorrow"},{" "}
+                              {format(new Date(`2000-01-01T${classItem.class_time}`), "h:mm a")}
+                              {classItem.room && ` • ${classItem.room}`}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Badge 
+                            variant={getCapacityBadgeVariant(classItem.current_bookings, classItem.max_capacity)}
+                          >
+                            {classItem.current_bookings}/{classItem.max_capacity}
+                          </Badge>
+                          {classItem.waitlist_count > 0 && (
+                            <Badge variant="outline" className="text-orange-600">
+                              +{classItem.waitlist_count} waiting
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+                    </ClassStudentModal>
+                  ))}
                 </div>
-                
-                <div className="flex items-center justify-between p-3 border border-border rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                    <div>
-                      <p className="font-medium">Pilates Core</p>
-                      <p className="text-sm text-muted-foreground">Tomorrow, 7:00 AM</p>
-                    </div>
-                  </div>
-                  <Badge variant="secondary">15 students</Badge>
+              ) : (
+                <div className="text-center py-8 text-muted-foreground">
+                  No upcoming classes scheduled
                 </div>
-              </div>
+              )}
               
               <Button className="w-full mt-4" variant="outline">
                 View Full Schedule
@@ -121,10 +176,12 @@ const InstructorHub = () => {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-2 gap-4">
-                <Button className="h-20 flex flex-col gap-2" variant="outline">
-                  <BookOpen className="h-6 w-6" />
-                  <span className="text-sm">Create Class</span>
-                </Button>
+                <CreateClassModal>
+                  <Button className="h-20 flex flex-col gap-2" variant="outline">
+                    <BookOpen className="h-6 w-6" />
+                    <span className="text-sm">Create Class</span>
+                  </Button>
+                </CreateClassModal>
                 
                 <Button className="h-20 flex flex-col gap-2" variant="outline">
                   <Video className="h-6 w-6" />
@@ -132,8 +189,8 @@ const InstructorHub = () => {
                 </Button>
                 
                 <Button className="h-20 flex flex-col gap-2" variant="outline">
-                  <Users className="h-6 w-6" />
-                  <span className="text-sm">Student List</span>
+                  <UserCheck className="h-6 w-6" />
+                  <span className="text-sm">Attendance</span>
                 </Button>
                 
                 <Button className="h-20 flex flex-col gap-2" variant="outline">
@@ -145,36 +202,50 @@ const InstructorHub = () => {
           </Card>
         </div>
 
-        {/* Recent Activity */}
+        {/* Performance Overview */}
         <Card className="mt-6">
           <CardHeader>
-            <CardTitle>Recent Activity</CardTitle>
-            <CardDescription>Latest updates from your classes and students</CardDescription>
+            <CardTitle>Performance Overview</CardTitle>
+            <CardDescription>Weekly performance metrics and trends</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              <div className="flex items-start gap-3 p-3 border border-border rounded-lg">
-                <div className="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
-                <div>
-                  <p className="font-medium">New student joined Yoga Flow - Beginner</p>
-                  <p className="text-sm text-muted-foreground">Sarah Miller • 2 hours ago</p>
+            {metricsLoading ? (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="space-y-2">
+                    <Skeleton className="h-4 w-24" />
+                    <Skeleton className="h-8 w-16" />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="text-center p-4 border rounded-lg">
+                  <div className="text-2xl font-bold text-green-600">{metrics?.attendanceRate || 0}%</div>
+                  <div className="text-sm text-muted-foreground">Attendance Rate</div>
+                  <div className="text-xs text-muted-foreground mt-1">This week</div>
+                </div>
+                
+                <div className="text-center p-4 border rounded-lg">
+                  <div className="text-2xl font-bold text-blue-600">{metrics?.totalClasses || 0}</div>
+                  <div className="text-sm text-muted-foreground">Total Classes</div>
+                  <div className="text-xs text-muted-foreground mt-1">This week</div>
+                </div>
+                
+                <div className="text-center p-4 border rounded-lg">
+                  <div className="text-2xl font-bold text-purple-600">{metrics?.totalStudents || 0}</div>
+                  <div className="text-sm text-muted-foreground">Active Students</div>
+                  <div className="text-xs text-muted-foreground mt-1">Current</div>
                 </div>
               </div>
-              
-              <div className="flex items-start gap-3 p-3 border border-border rounded-lg">
-                <div className="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
-                <div>
-                  <p className="font-medium">Class review received</p>
-                  <p className="text-sm text-muted-foreground">"Amazing HIIT session!" - Mike Johnson • 5 hours ago</p>
-                </div>
-              </div>
-              
-              <div className="flex items-start gap-3 p-3 border border-border rounded-lg">
-                <div className="w-2 h-2 bg-purple-500 rounded-full mt-2"></div>
-                <div>
-                  <p className="font-medium">Class capacity reached</p>
-                  <p className="text-sm text-muted-foreground">Pilates Core is now full • 1 day ago</p>
-                </div>
+            )}
+            
+            <div className="mt-6 pt-6 border-t">
+              <h4 className="font-medium mb-3">Quick Insights</h4>
+              <div className="space-y-2 text-sm text-muted-foreground">
+                <p>• Most popular class time: Morning sessions (7-9 AM)</p>
+                <p>• Average class size: {metrics ? Math.round((metrics.totalStudents || 0) / (metrics.classesThisWeek || 1)) : 0} students</p>
+                <p>• Highest attendance: Yoga Flow classes</p>
               </div>
             </div>
           </CardContent>

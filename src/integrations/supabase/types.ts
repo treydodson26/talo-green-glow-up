@@ -264,6 +264,67 @@ export type Database = {
         }
         Relationships: []
       }
+      customer_segments: {
+        Row: {
+          assigned_at: string
+          created_at: string
+          customer_id: number
+          id: string
+          last_visit_date: string | null
+          manually_assigned: boolean
+          notes: string | null
+          segment_type: string
+          total_spend: number | null
+          updated_at: string
+        }
+        Insert: {
+          assigned_at?: string
+          created_at?: string
+          customer_id: number
+          id?: string
+          last_visit_date?: string | null
+          manually_assigned?: boolean
+          notes?: string | null
+          segment_type: string
+          total_spend?: number | null
+          updated_at?: string
+        }
+        Update: {
+          assigned_at?: string
+          created_at?: string
+          customer_id?: number
+          id?: string
+          last_visit_date?: string | null
+          manually_assigned?: boolean
+          notes?: string | null
+          segment_type?: string
+          total_spend?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_segments_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customer_engagement_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_segments_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_segments_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "intro_offer_customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       customers: {
         Row: {
           address: string | null
@@ -357,6 +418,174 @@ export type Database = {
         }
         Relationships: []
       }
+      email_queue: {
+        Row: {
+          created_at: string
+          customer_id: number
+          email_data: Json | null
+          error_message: string | null
+          id: string
+          scheduled_for: string
+          segment_type: string
+          sent_at: string | null
+          status: string
+          template_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          customer_id: number
+          email_data?: Json | null
+          error_message?: string | null
+          id?: string
+          scheduled_for: string
+          segment_type: string
+          sent_at?: string | null
+          status?: string
+          template_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          customer_id?: number
+          email_data?: Json | null
+          error_message?: string | null
+          id?: string
+          scheduled_for?: string
+          segment_type?: string
+          sent_at?: string | null
+          status?: string
+          template_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "email_queue_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customer_engagement_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "email_queue_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "email_queue_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "intro_offer_customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "email_queue_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "email_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      email_templates: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          is_active: boolean
+          subject: string
+          template_name: string
+          template_type: string
+          updated_at: string
+          variables: Json | null
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          subject: string
+          template_name: string
+          template_type: string
+          updated_at?: string
+          variables?: Json | null
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          subject?: string
+          template_name?: string
+          template_type?: string
+          updated_at?: string
+          variables?: Json | null
+        }
+        Relationships: []
+      }
+      email_tracking: {
+        Row: {
+          clicked_at: string | null
+          created_at: string
+          customer_id: number
+          email_content: string | null
+          email_subject: string | null
+          id: string
+          opened_at: string | null
+          replied_at: string | null
+          sent_at: string
+          template_type: string
+        }
+        Insert: {
+          clicked_at?: string | null
+          created_at?: string
+          customer_id: number
+          email_content?: string | null
+          email_subject?: string | null
+          id?: string
+          opened_at?: string | null
+          replied_at?: string | null
+          sent_at?: string
+          template_type: string
+        }
+        Update: {
+          clicked_at?: string | null
+          created_at?: string
+          customer_id?: number
+          email_content?: string | null
+          email_subject?: string | null
+          id?: string
+          opened_at?: string | null
+          replied_at?: string | null
+          sent_at?: string
+          template_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "email_tracking_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customer_engagement_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "email_tracking_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "email_tracking_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "intro_offer_customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       leads: {
         Row: {
           assigned_to: string | null
@@ -435,6 +664,42 @@ export type Database = {
           message_type?: string
           subject?: string | null
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      segment_analytics: {
+        Row: {
+          conversions: number
+          created_at: string
+          date: string
+          emails_clicked: number
+          emails_opened: number
+          emails_sent: number
+          id: string
+          segment_type: string
+          total_customers: number
+        }
+        Insert: {
+          conversions?: number
+          created_at?: string
+          date?: string
+          emails_clicked?: number
+          emails_opened?: number
+          emails_sent?: number
+          id?: string
+          segment_type: string
+          total_customers?: number
+        }
+        Update: {
+          conversions?: number
+          created_at?: string
+          date?: string
+          emails_clicked?: number
+          emails_opened?: number
+          emails_sent?: number
+          id?: string
+          segment_type?: string
+          total_customers?: number
         }
         Relationships: []
       }
@@ -566,7 +831,10 @@ export type Database = {
       }
     }
     Functions: {
-      [_ in never]: never
+      assign_customer_segment: {
+        Args: { customer_id_param: number }
+        Returns: string
+      }
     }
     Enums: {
       [_ in never]: never

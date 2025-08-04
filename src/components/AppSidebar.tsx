@@ -7,7 +7,8 @@ import {
   UserPlus,
   GraduationCap,
   Cog,
-  Megaphone
+  Megaphone,
+  Target
 } from "lucide-react";
 import {
   Sidebar,
@@ -40,6 +41,7 @@ const bottomNavItems = [
   { id: "operations-hub", icon: Cog, label: "Operations Hub" },
   { id: "instructor-hub", icon: GraduationCap, label: "Instructor Hub" },
   { id: "segments", icon: BarChart3, label: "Segments" },
+  { id: "lead-management", icon: Target, label: "Lead Management" },
   { id: "settings", icon: Settings, label: "Settings" },
 ];
 

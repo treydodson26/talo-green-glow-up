@@ -11,6 +11,7 @@ import MarketingHub from "@/components/MarketingHub";
 import { ClassSchedulePage } from "@/components/schedule/ClassSchedulePage";
 import { MyBookingsPage } from "@/components/schedule/MyBookingsPage";
 import CustomerSegments from "@/components/CustomerSegments";
+import { LeadManagementHub } from "@/components/lead-management/LeadManagementHub";
 
 const MainLayout = () => {
   const [activeRoute, setActiveRoute] = useState("customers");
@@ -35,6 +36,8 @@ const MainLayout = () => {
         return <MyBookingsPage />;
       case "segments":
         return <CustomerSegments />;
+      case "lead-management":
+        return <LeadManagementHub />;
       case "comments":
         return (
           <div className="talo-container">

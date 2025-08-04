@@ -8,6 +8,7 @@ import { QuickActions } from "./dashboard/QuickActions";
 import { LiveMetrics } from "./dashboard/LiveMetrics";
 import { ActivityFeed } from "./dashboard/ActivityFeed";
 import { ClassHeatMap } from "./dashboard/ClassHeatMap";
+import { PersonalizedWelcome } from "./dashboard/PersonalizedWelcome";
 import { TestWhatsApp } from "@/components/TestWhatsApp";
 import { TestIntroMessages } from "@/components/TestIntroMessages";
 import { Card, CardContent } from "@/components/ui/card";
@@ -35,36 +36,14 @@ const HomePage = () => {
 
   return (
     <div className="flex-1 p-8 bg-gradient-to-br from-background via-background to-accent/20 min-h-screen">
-      {/* Welcome Header */}
+      {/* Personalized Welcome Experience */}
       <div className="mb-12">
-        <Card className="border-0 bg-gradient-to-r from-primary/5 via-primary/3 to-transparent shadow-none">
-          <CardContent className="p-8">
-            <div className="flex items-center justify-between">
-              <div className="space-y-2">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-primary/10 rounded-full">
-                    <Sparkles className="h-5 w-5 text-primary" />
-                  </div>
-                  <h1 className="text-4xl font-light text-foreground">
-                    {greeting()}, Emily
-                  </h1>
-                </div>
-                <p className="text-lg text-muted-foreground ml-11">
-                  Welcome back to your Talo Studio dashboard
-                </p>
-              </div>
-              <div className="text-right space-y-1">
-                <div className="flex items-center gap-3 text-foreground">
-                  <Calendar className="h-5 w-5 text-primary" />
-                  <span className="text-lg font-medium">{currentDate}</span>
-                </div>
-                <div className="text-muted-foreground ml-8">
-                  {currentTime} • Studio Open
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <PersonalizedWelcome />
+      </div>
+
+      {/* Live Metrics Section */}
+      <div className="mb-8 animate-fade-in">
+        <LiveMetrics />
       </div>
 
       {/* Key Metrics Overview */}
@@ -74,11 +53,6 @@ const HomePage = () => {
           <h2 className="text-xl font-medium text-foreground">Studio Overview</h2>
         </div>
         <MetricsCards />
-      </div>
-
-      {/* Live Metrics Section */}
-      <div className="mb-8 animate-fade-in">
-        <LiveMetrics />
       </div>
 
       {/* Important Updates with Pulse Effect */}

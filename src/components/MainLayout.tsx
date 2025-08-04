@@ -10,6 +10,7 @@ import OperationsHub from "@/components/OperationsHub";
 import MarketingHub from "@/components/MarketingHub";
 import { ClassSchedulePage } from "@/components/schedule/ClassSchedulePage";
 import { MyBookingsPage } from "@/components/schedule/MyBookingsPage";
+import CustomerSegments from "@/components/CustomerSegments";
 
 const MainLayout = () => {
   const [activeRoute, setActiveRoute] = useState("customers");
@@ -33,14 +34,7 @@ const MainLayout = () => {
       case "my-bookings":
         return <MyBookingsPage />;
       case "segments":
-        return (
-          <div className="talo-container">
-            <div className="talo-card-intimate">
-              <h1 className="text-2xl font-semibold talo-text-sage">Customer Segments</h1>
-              <p className="talo-text-earth mt-2">Discover natural patterns in your community...</p>
-            </div>
-          </div>
-        );
+        return <CustomerSegments />;
       case "comments":
         return (
           <div className="talo-container">

@@ -88,6 +88,51 @@ export type Database = {
           },
         ]
       }
+      campaigns: {
+        Row: {
+          audience_type: string
+          content: string | null
+          created_at: string
+          id: string
+          name: string
+          open_rate: number
+          scheduled_for: string | null
+          sent_count: number
+          status: string
+          subject: string | null
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          audience_type?: string
+          content?: string | null
+          created_at?: string
+          id?: string
+          name: string
+          open_rate?: number
+          scheduled_for?: string | null
+          sent_count?: number
+          status?: string
+          subject?: string | null
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          audience_type?: string
+          content?: string | null
+          created_at?: string
+          id?: string
+          name?: string
+          open_rate?: number
+          scheduled_for?: string | null
+          sent_count?: number
+          status?: string
+          subject?: string | null
+          type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       classes_schedule: {
         Row: {
           class_date: string

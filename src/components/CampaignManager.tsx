@@ -60,99 +60,121 @@ const CampaignManager = () => {
   }, []);
 
   const loadCampaigns = async () => {
-    // For now, use mock data. In production, this would fetch from Supabase
-    const mockCampaigns: Campaign[] = [
-      {
-        id: "1",
-        name: "Back to School Special",
-        type: "promotion",
-        status: "active",
-        subject: "Get Ready for Fall with 30% Off New Student Packages!",
-        content: "Welcome back to routine! Start your yoga journey this fall with our special intro package...",
-        audienceType: "prospects",
-        scheduledDate: "2024-08-15",
-        createdAt: "2024-08-10",
-        sentCount: 245,
-        openRate: 28.5
-      },
-      {
-        id: "2", 
-        name: "Monthly Newsletter - August",
-        type: "newsletter",
-        status: "completed",
-        subject: "Tallow Yoga August Newsletter",
-        content: "This month we're excited to share updates about our new classes, teacher spotlights...",
-        audienceType: "all",
-        scheduledDate: "2024-08-01",
-        createdAt: "2024-07-28",
-        sentCount: 892,
-        openRate: 31.2
-      },
-      {
-        id: "3",
-        name: "Re-engagement Campaign",
-        type: "reengagement", 
-        status: "draft",
-        subject: "We Miss You at Tallow Yoga!",
-        content: "It's been a while since we've seen you on the mat. We'd love to welcome you back...",
-        audienceType: "inactive",
-        createdAt: "2024-08-12"
-      }
-    ];
-    
-    setCampaigns(mockCampaigns);
+    try {
+      const { data, error } = await supabase
+        .from('campaigns')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      const mapped: Campaign[] = (data || []).map((c: any) => ({
+        id: c.id,
+        name: c.name,
+        type: c.type,
+        status: c.status,
+        subject: c.subject ?? '',
+        content: c.content ?? '',
+        audienceType: c.audience_type ?? 'all',
+        scheduledDate: c.scheduled_for ?? undefined,
+        createdAt: c.created_at,
+        sentCount: c.sent_count ?? 0,
+        openRate: c.open_rate ?? 0,
+      }));
+
+      setCampaigns(mapped);
+    } catch (err) {
+      console.error('Error loading campaigns:', err);
+      toast({
+        title: 'Failed to load campaigns',
+        description: 'Please make sure you are logged in and RLS allows access.',
+        variant: 'destructive',
+      });
+    }
   };
 
   const handleCreateCampaign = async () => {
     try {
-      const newCampaign: Campaign = {
-        id: crypto.randomUUID(),
+      const payload = {
         name: formData.name,
         type: formData.type,
         status: formData.scheduledDate ? 'scheduled' : 'draft',
         subject: formData.subject,
         content: formData.content,
-        audienceType: formData.audienceType,
-        scheduledDate: formData.scheduledDate,
-        createdAt: new Date().toISOString()
-      };
+        audience_type: formData.audienceType,
+        scheduled_for: formData.scheduledDate ? new Date(formData.scheduledDate).toISOString() : null,
+      } as const;
 
-      setCampaigns(prev => [newCampaign, ...prev]);
-      
+      if (editingCampaign) {
+        const { data, error } = await supabase
+          .from('campaigns')
+          .update(payload)
+          .eq('id', editingCampaign.id)
+          .select('*')
+          .maybeSingle();
+        if (error) throw error;
+        toast({ title: 'Campaign updated', description: `${payload.name} has been updated.` });
+      } else {
+        const { data, error } = await supabase
+          .from('campaigns')
+          .insert(payload)
+          .select('*')
+          .maybeSingle();
+        if (error) throw error;
+        toast({ title: 'Campaign created', description: `${payload.name} has been created.` });
+      }
+
+      // Refresh list
+      await loadCampaigns();
+
       // Reset form
       setFormData({
-        name: "",
-        type: "newsletter",
-        subject: "",
-        content: "",
-        audienceType: "all",
-        scheduledDate: "",
-        scheduledTime: ""
+        name: '',
+        type: 'newsletter',
+        subject: '',
+        content: '',
+        audienceType: 'all',
+        scheduledDate: '',
+        scheduledTime: ''
       });
-      
+      setEditingCampaign(null);
       setShowCreateForm(false);
-
-      toast({
-        title: "Campaign created",
-        description: `${newCampaign.name} has been created successfully`,
-      });
-
     } catch (error) {
-      console.error("Error creating campaign:", error);
+      console.error('Error saving campaign:', error);
       toast({
-        title: "Error",
-        description: "Failed to create campaign",
-        variant: "destructive"
+        title: 'Error',
+        description: 'Failed to save campaign',
+        variant: 'destructive',
       });
     }
   };
 
-  const handleDeleteCampaign = (campaignId: string) => {
-    setCampaigns(prev => prev.filter(c => c.id !== campaignId));
-    toast({
-      title: "Campaign deleted",
-      description: "Campaign has been removed",
-    });
+  const handleDeleteCampaign = async (campaignId: string) => {
+    try {
+      const { error } = await supabase
+        .from('campaigns')
+        .delete()
+        .eq('id', campaignId);
+      if (error) throw error;
+      setCampaigns(prev => prev.filter(c => c.id !== campaignId));
+      toast({ title: 'Campaign deleted', description: 'Campaign has been removed' });
+    } catch (error) {
+      console.error('Error deleting campaign:', error);
+      toast({ title: 'Error', description: 'Failed to delete campaign', variant: 'destructive' });
+    }
+  };
+
+  const handleSendCampaign = async (campaign: Campaign) => {
+    try {
+      // Placeholder: will wire to Resend edge function after RESEND_API_KEY is added
+      toast({
+        title: 'Email sending not configured',
+        description: 'Add RESEND_API_KEY to enable sending; we will wire the Resend edge function next.',
+      });
+    } catch (error) {
+      console.error('Error sending campaign:', error);
+      toast({ title: 'Failed to send campaign', variant: 'destructive' });
+    }
   };
 
   const getStatusBadge = (status: Campaign['status']) => {
@@ -275,13 +297,25 @@ const CampaignManager = () => {
                       </div>
                       
                       <div className="flex items-center gap-2 ml-4">
-                        <Button variant="outline" size="sm">
+                        <Button variant="outline" size="sm" onClick={() => {
+                          setEditingCampaign(campaign);
+                          setFormData({
+                            name: campaign.name,
+                            type: campaign.type,
+                            subject: campaign.subject,
+                            content: campaign.content,
+                            audienceType: campaign.audienceType,
+                            scheduledDate: campaign.scheduledDate ? campaign.scheduledDate.split('T')[0] : '',
+                            scheduledTime: ''
+                          });
+                          setShowCreateForm(true);
+                        }}>
                           <Edit className="w-4 h-4 mr-1" />
                           Edit
                         </Button>
                         
                         {campaign.status === "draft" && (
-                          <Button size="sm">
+                          <Button size="sm" onClick={() => handleSendCampaign(campaign)}>
                             <Send className="w-4 h-4 mr-1" />
                             Send
                           </Button>
@@ -308,7 +342,7 @@ const CampaignManager = () => {
       {showCreateForm && (
         <Card>
           <CardHeader>
-            <CardTitle>Create New Campaign</CardTitle>
+            <CardTitle>{editingCampaign ? 'Edit Campaign' : 'Create New Campaign'}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -385,7 +419,7 @@ const CampaignManager = () => {
 
             <div className="flex gap-3 pt-4">
               <Button onClick={handleCreateCampaign}>
-                Create Campaign
+                {editingCampaign ? 'Save Changes' : 'Create Campaign'}
               </Button>
               <Button variant="outline" onClick={() => setShowCreateForm(false)}>
                 Cancel

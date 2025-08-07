@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { Search, Plus, Bell, User, Sparkles } from "lucide-react";
+import { Search, Plus, Bell, User, Sparkles, BarChart3 } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const TopBar = () => {
@@ -30,6 +30,12 @@ const TopBar = () => {
 
       {/* Right side - Actions */}
       <div className="flex items-center gap-2">
+        <Button asChild variant="secondary" size="sm">
+          <Link to="/bi" aria-label="Open BI Insights" className="flex items-center gap-1">
+            <BarChart3 className="h-4 w-4" />
+            <span className="hidden sm:inline">Insights</span>
+          </Link>
+        </Button>
         <Button variant="ghost" size="icon">
           <Plus className="h-4 w-4" />
         </Button>

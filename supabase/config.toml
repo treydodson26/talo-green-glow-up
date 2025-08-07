@@ -12,3 +12,6 @@ verify_jwt = false
 
 [functions.anthropic-generate]
 verify_jwt = false
+
+[functions.ai-query]
+verify_jwt = true

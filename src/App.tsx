@@ -10,6 +10,7 @@ import NewsletterCampaign from "./components/NewsletterCampaign";
 import { ClassSchedulePage } from "./components/schedule/ClassSchedulePage";
 import { MyBookingsPage } from "./components/schedule/MyBookingsPage";
 import AIPlayground from "./pages/AIPlayground";
+import BIDashboard from "./pages/BIDashboard";
 
 const queryClient = new QueryClient();
 
@@ -26,6 +27,7 @@ const App = () => (
           <Route path="/classes" element={<ClassSchedulePage />} />
           <Route path="/my-bookings" element={<MyBookingsPage />} />
           <Route path="/ai" element={<AIPlayground />} />
+          <Route path="/bi" element={<BIDashboard />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

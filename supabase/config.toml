@@ -9,3 +9,6 @@ max_rows = 1000
 
 [functions.send-whatsapp-message]
 verify_jwt = false
+
+[functions.anthropic-generate]
+verify_jwt = false

@@ -9,6 +9,7 @@ import NotFound from "./pages/NotFound";
 import NewsletterCampaign from "./components/NewsletterCampaign";
 import { ClassSchedulePage } from "./components/schedule/ClassSchedulePage";
 import { MyBookingsPage } from "./components/schedule/MyBookingsPage";
+import AIPlayground from "./pages/AIPlayground";
 
 const queryClient = new QueryClient();
 
@@ -24,6 +25,7 @@ const App = () => (
           <Route path="/schedule" element={<ClassSchedulePage />} />
           <Route path="/classes" element={<ClassSchedulePage />} />
           <Route path="/my-bookings" element={<MyBookingsPage />} />
+          <Route path="/ai" element={<AIPlayground />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

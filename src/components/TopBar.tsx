@@ -1,7 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { Search, Plus, Bell, User } from "lucide-react";
+import { Search, Plus, Bell, User, Sparkles } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const TopBar = () => {
   return (
@@ -34,6 +35,12 @@ const TopBar = () => {
         </Button>
         <Button variant="ghost" size="icon">
           <Bell className="h-4 w-4" />
+        </Button>
+        <Button asChild variant="secondary" size="sm">
+          <Link to="/ai" aria-label="Open Claude AI Playground" className="flex items-center gap-1">
+            <Sparkles className="h-4 w-4" />
+            <span className="hidden sm:inline">Claude</span>
+          </Link>
         </Button>
         <Button variant="ghost" size="icon">
           <User className="h-4 w-4" />

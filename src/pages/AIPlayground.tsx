@@ -65,10 +65,13 @@ export default function AIPlayground() {
       });
 
       if (error) {
-        console.error("anthropic-generate error:", error);
+        // Capture details from the Edge Function response body when available
+        const body = data as any;
+        console.error("anthropic-generate error:", error, body);
+        setOutput(typeof body === "string" ? body : JSON.stringify(body, null, 2));
         toast({
           title: "Generation failed",
-          description: error.message || "Unknown error calling Edge Function",
+          description: body?.error ? `${body.error} (${body.status || ''})` : (error.message || "Unknown error"),
           variant: "destructive",
         });
         return;

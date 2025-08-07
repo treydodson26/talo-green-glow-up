@@ -82,40 +82,59 @@ serve(async (req: Request) => {
       );
     }
 
-    const payload = {
+    // Build candidate models: selected first, then fallbacks
+    const candidates = Array.from(new Set([
       model,
-      system,
-      messages,
-      max_tokens,
-      temperature,
-    } as const;
-
-    console.log("[anthropic-generate] Request", { requestId, model, max_tokens, temperature });
+      "claude-3-5-sonnet-20240620",
+      "claude-3-haiku-20240307",
+    ]));
 
     let resp: Response | undefined;
     let lastErrBody: string | undefined;
-    for (let attempt = 1; attempt <= 2; attempt++) {
-      try {
-        const r = await fetch("https://api.anthropic.com/v1/messages", {
-          method: "POST",
-          headers: {
-            "x-api-key": ANTHROPIC_API_KEY,
-            "anthropic-version": "2023-06-01",
-            "content-type": "application/json",
-          },
-          body: JSON.stringify(payload),
-        });
-        if (r.ok) {
-          resp = r;
-          break;
+    let usedModel = model;
+    const attemptsLog: Array<{ model: string; attempt: number; status?: number; error?: string }> = [];
+
+    for (const candidate of candidates) {
+      usedModel = candidate;
+      const payload = {
+        model: candidate,
+        system,
+        messages,
+        max_tokens,
+        temperature,
+      } as const;
+
+      for (let attempt = 1; attempt <= 2; attempt++) {
+        try {
+          const r = await fetch("https://api.anthropic.com/v1/messages", {
+            method: "POST",
+            headers: {
+              "x-api-key": ANTHROPIC_API_KEY,
+              "anthropic-version": "2023-06-01",
+              "content-type": "application/json",
+              "user-agent": "supabase-edge-anthropic-generate/1.0",
+            },
+            body: JSON.stringify(payload),
+          });
+
+          if (r.ok) {
+            resp = r;
+            break;
+          }
+
+          lastErrBody = await r.text().catch(() => "");
+          attemptsLog.push({ model: candidate, attempt, status: r.status, error: lastErrBody?.slice(0, 500) });
+          console.warn("[anthropic-generate] Non-200 from Anthropic", { requestId, status: r.status, attempt, model: candidate });
+          await new Promise((res) => setTimeout(res, 300 * attempt));
+        } catch (e) {
+          const err = String(e);
+          attemptsLog.push({ model: candidate, attempt, error: err });
+          console.warn("[anthropic-generate] Network error to Anthropic", { requestId, attempt, model: candidate, error: err });
+          await new Promise((res) => setTimeout(res, 300 * attempt));
         }
-        lastErrBody = await r.text().catch(() => "");
-        console.warn("[anthropic-generate] Non-200 from Anthropic", { requestId, status: r.status, attempt, body: lastErrBody });
-        await new Promise((res) => setTimeout(res, 300 * attempt));
-      } catch (e) {
-        console.warn("[anthropic-generate] Network error to Anthropic", { requestId, attempt, error: String(e) });
-        await new Promise((res) => setTimeout(res, 300 * attempt));
       }
+
+      if (resp?.ok) break; // stop if success
     }
 
     if (!resp) {
@@ -124,6 +143,7 @@ serve(async (req: Request) => {
           error: "Anthropic API error",
           status: 502,
           details: lastErrBody || "No response",
+          attempts: attemptsLog,
           requestId,
         }),
         { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } }

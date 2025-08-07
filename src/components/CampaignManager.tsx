@@ -166,14 +166,25 @@ const CampaignManager = () => {
 
   const handleSendCampaign = async (campaign: Campaign) => {
     try {
-      // Placeholder: will wire to Resend edge function after RESEND_API_KEY is added
-      toast({
-        title: 'Email sending not configured',
-        description: 'Add RESEND_API_KEY to enable sending; we will wire the Resend edge function next.',
+      const { data, error } = await supabase.functions.invoke('send-campaign-email', {
+        body: { campaign_id: campaign.id },
       });
-    } catch (error) {
+      if (error) throw error;
+      if (!data?.success) {
+        throw new Error(data?.error || 'Send failed');
+      }
+      toast({
+        title: 'Campaign sent',
+        description: `Sent to ${data.sent} recipients${data.failed ? `, ${data.failed} failed` : ''}.`,
+      });
+      await loadCampaigns();
+    } catch (error: any) {
       console.error('Error sending campaign:', error);
-      toast({ title: 'Failed to send campaign', variant: 'destructive' });
+      toast({
+        title: 'Failed to send campaign',
+        description: error?.message || 'Unknown error',
+        variant: 'destructive',
+      });
     }
   };
 

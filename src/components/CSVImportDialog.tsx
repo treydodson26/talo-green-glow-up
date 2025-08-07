@@ -268,138 +268,90 @@ const CSVImportDialog: React.FC<CSVImportDialogProps> = ({
   const processImport = async () => {
     setIsImporting(true);
     setImportProgress(0);
-    
-    const startTime = Date.now();
-    const transformedData = transformData(csvData);
-    const batchSize = 10;
-    const totalBatches = Math.ceil(transformedData.length / batchSize);
-    
-    let successCount = 0;
-    let errorCount = 0;
-    let duplicateCount = 0;
-    const errorLog: string[] = [];
-    
+
     try {
-      // Create import record
+      if (!csvFile) {
+        toast({ title: 'No file selected', variant: 'destructive' });
+        setIsImporting(false);
+        return;
+      }
+
+      // 1) Create import record
       const { data: importRecord, error: importError } = await supabase
         .from('csv_imports')
         .insert({
           filename: csvFile?.name || 'unknown.csv',
-          total_records: transformedData.length,
+          total_records: csvData.length,
           new_records: 0,
           updated_records: 0,
-          status: 'processing'
+          status: 'processing',
         })
         .select()
         .single();
-      
+
       if (importError) throw importError;
-      
-      for (let i = 0; i < totalBatches && !importCancelled; i++) {
-        const batch = transformedData.slice(i * batchSize, (i + 1) * batchSize);
-        
-        for (const customer of batch) {
-          if (importCancelled) break;
-          
-          try {
-            // Validate required fields
-            if (!customer.first_name || !customer.last_name || !customer.client_email) {
-              errorLog.push(`Row ${(i * batchSize) + batch.indexOf(customer) + 2}: Missing required fields`);
-              errorCount++;
-              continue;
-            }
-            
-            // Validate email
-            if (!isValidEmail(customer.client_email)) {
-              errorLog.push(`Row ${(i * batchSize) + batch.indexOf(customer) + 2}: Invalid email format`);
-              errorCount++;
-              continue;
-            }
-            
-            // Check for duplicates
-            const { data: existing } = await supabase
-              .from('customers')
-              .select('id')
-              .eq('client_email', customer.client_email)
-              .single();
-            
-            if (existing) {
-              errorLog.push(`Row ${(i * batchSize) + batch.indexOf(customer) + 2}: Email already exists`);
-              duplicateCount++;
-              continue;
-            }
-            
-            // Set client_name for compatibility
-            const customerData = {
-              ...customer,
-              client_name: `${customer.first_name} ${customer.last_name}`
-            };
-            
-            // Insert customer
-            const { error: insertError } = await supabase
-              .from('customers')
-              .insert(customerData);
-            
-            if (insertError) {
-              errorLog.push(`Row ${(i * batchSize) + batch.indexOf(customer) + 2}: ${insertError.message}`);
-              errorCount++;
-            } else {
-              successCount++;
-            }
-          } catch (error: any) {
-            errorLog.push(`Row ${(i * batchSize) + batch.indexOf(customer) + 2}: ${error.message}`);
-            errorCount++;
+
+      // 2) Upload file to Storage bucket 'imports'
+      const storageName = `${Date.now()}-${csvFile.name}`;
+      const { error: uploadError } = await supabase
+        .storage
+        .from('imports')
+        .upload(storageName, csvFile, { upsert: true, contentType: 'text/csv' });
+      if (uploadError) throw uploadError;
+
+      // 3) Invoke background edge function
+      const { data, error: fnError } = await supabase.functions.invoke('process-csv-import', {
+        body: {
+          import_id: importRecord.id,
+          storage_path: `imports/${storageName}`,
+          mapping: fieldMapping,
+        }
+      });
+      if (fnError) throw fnError;
+
+      // 4) Poll for status updates
+      const poll = async () => {
+        const { data: rec } = await supabase
+          .from('csv_imports')
+          .select('status,new_records,failed_records,error_details,total_records,processing_time_ms')
+          .eq('id', importRecord.id)
+          .maybeSingle();
+
+        if (rec) {
+          const total = rec.total_records || 0;
+          const succeeded = rec.new_records || 0;
+          const failed = rec.failed_records || 0;
+          const progress = total ? Math.min(100, Math.round(((succeeded + failed) / total) * 100)) : 0;
+          setImportProgress(progress);
+
+          if (rec.status === 'completed' || rec.status === 'cancelled') {
+            const errorsArr: string[] = (rec as any)?.error_details?.errors || [];
+            const duplicates = errorsArr.filter((e) => e.includes('duplicate')).length;
+            setImportResult({
+              success: succeeded,
+              errors: failed - duplicates >= 0 ? failed - duplicates : failed,
+              duplicates,
+              errorLog: errorsArr,
+              importId: importRecord.id,
+              processingTime: rec.processing_time_ms || 0,
+            });
+            setIsImporting(false);
+            setStep(5);
+            return;
           }
         }
-        
-        // Update progress
-        setImportProgress(((i + 1) / totalBatches) * 100);
-        
-        // Small delay to prevent overwhelming the database
-        await new Promise(resolve => setTimeout(resolve, 100));
-      }
-      
-      const processingTime = Date.now() - startTime;
-      
-      // Update import record
-      await supabase
-        .from('csv_imports')
-        .update({
-          new_records: successCount,
-          failed_records: errorCount + duplicateCount,
-          error_details: errorLog.length > 0 ? { errors: errorLog } : null,
-          processing_time_ms: processingTime,
-          completed_at: new Date().toISOString(),
-          status: importCancelled ? 'cancelled' : 'completed'
-        })
-        .eq('id', importRecord.id);
-      
-      setImportResult({
-        success: successCount,
-        errors: errorCount,
-        duplicates: duplicateCount,
-        errorLog,
-        importId: importRecord.id,
-        processingTime
-      });
-      
-      setStep(5);
-      
-      if (successCount > 0) {
-        onImportComplete();
-      }
-      
+        setTimeout(poll, 1500);
+      };
+
+      setStep(4);
+      poll();
     } catch (error: any) {
-      console.error('Import error:', error);
-      errorLog.push(`System error: ${error.message}`);
-      setImportResult({
-        success: successCount,
-        errors: errorCount + 1,
-        duplicates: duplicateCount,
-        errorLog
+      console.error('Import start error:', error);
+      toast({
+        title: 'Import failed to start',
+        description: error?.message || 'Unknown error',
+        variant: 'destructive',
       });
-      setStep(5);
-    } finally {
       setIsImporting(false);
     }
   };

@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import Anthropic from "npm:@anthropic-ai/sdk";
 
 // CORS headers required for web calls
 const corsHeaders: HeadersInit = {
@@ -89,7 +90,7 @@ serve(async (req: Request) => {
       "claude-3-haiku-20240307",
     ]));
 
-    let resp: Response | undefined;
+    let data: any | undefined;
     let lastErrBody: string | undefined;
     let usedModel = model;
     const attemptsLog: Array<{ model: string; attempt: number; status?: number; error?: string }> = [];
@@ -106,38 +107,25 @@ serve(async (req: Request) => {
 
       for (let attempt = 1; attempt <= 2; attempt++) {
         try {
-          const r = await fetch("https://api.anthropic.com/v1/messages", {
-            method: "POST",
-            headers: {
-              "x-api-key": ANTHROPIC_API_KEY,
-              "anthropic-version": "2023-06-01",
-              "content-type": "application/json",
-              "user-agent": "supabase-edge-anthropic-generate/1.0",
-            },
-            body: JSON.stringify(payload),
-          });
-
-          if (r.ok) {
-            resp = r;
-            break;
-          }
-
-          lastErrBody = await r.text().catch(() => "");
-          attemptsLog.push({ model: candidate, attempt, status: r.status, error: lastErrBody?.slice(0, 500) });
-          console.warn("[anthropic-generate] Non-200 from Anthropic", { requestId, status: r.status, attempt, model: candidate });
-          await new Promise((res) => setTimeout(res, 300 * attempt));
-        } catch (e) {
-          const err = String(e);
-          attemptsLog.push({ model: candidate, attempt, error: err });
-          console.warn("[anthropic-generate] Network error to Anthropic", { requestId, attempt, model: candidate, error: err });
+          // Create SDK client per attempt to avoid global state and ensure fresh config
+          const client = new Anthropic({ apiKey: ANTHROPIC_API_KEY! });
+          const res = await client.messages.create(payload as any);
+          data = res as any;
+          break;
+        } catch (e: any) {
+          const status = typeof e?.status === "number" ? e.status : undefined;
+          const errText = e?.message ? String(e.message) : String(e);
+          lastErrBody = errText;
+          attemptsLog.push({ model: candidate, attempt, status, error: errText?.slice(0, 500) });
+          console.warn("[anthropic-generate] SDK error", { requestId, attempt, model: candidate, status, error: errText });
           await new Promise((res) => setTimeout(res, 300 * attempt));
         }
       }
 
-      if (resp?.ok) break; // stop if success
+      if (data) break; // stop if success
     }
 
-    if (!resp) {
+    if (!data) {
       return new Response(
         JSON.stringify({
           error: "Anthropic API error",
@@ -150,21 +138,6 @@ serve(async (req: Request) => {
       );
     }
 
-    if (!resp.ok) {
-      const errText = await resp.text().catch(() => "");
-      console.error("[anthropic-generate] Upstream error", { requestId, status: resp.status, body: errText });
-      return new Response(
-        JSON.stringify({
-          error: "Anthropic API error",
-          status: resp.status,
-          details: safeParse(errText),
-          requestId,
-        }),
-        { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
-    const data = await resp.json();
 
     // Extract plain text convenience field
     const text = Array.isArray(data?.content)

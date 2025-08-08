@@ -23,6 +23,13 @@ interface GenerateRequest {
   max_tokens?: number;
   temperature?: number;
   system?: string;
+  // Files API integration
+  file_ids?: string[]; // Anthropic File IDs to attach
+  use_file_search?: boolean; // enable Claude file_search tool
+  // File management actions
+  action?: "generate" | "list_files";
+  list_limit?: number;
+  list_order?: "asc" | "desc";
 }
 
 serve(async (req: Request) => {
@@ -49,7 +56,39 @@ serve(async (req: Request) => {
       );
     }
 
-    const body: GenerateRequest = await req.json().catch(() => ({} as GenerateRequest));
+const body: GenerateRequest = await req.json().catch(() => ({} as GenerateRequest));
+
+// Handle Files API listing
+if (body.action === "list_files") {
+  try {
+    const client = new Anthropic({ apiKey: ANTHROPIC_API_KEY! });
+    const params: Record<string, any> = {};
+    if (typeof body.list_limit === "number") params.limit = Math.max(1, Math.min(100, body.list_limit));
+    if (body.list_order === "asc" || body.list_order === "desc") params.order = body.list_order;
+    const list = await client.files.list(params as any);
+    // Map to minimal safe structure
+    const files = (list?.data ?? []).map((f: any) => ({
+      id: f.id,
+      filename: f.filename ?? f.name ?? f.id,
+      bytes: f.bytes ?? f.size ?? null,
+      created_at: f.created_at ?? null,
+      purpose: f.purpose ?? null,
+      type: f.type ?? f.mime_type ?? null,
+    }));
+    return new Response(JSON.stringify({ files, requestId }), {
+      status: 200,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  } catch (e: any) {
+    const status = typeof e?.status === "number" ? e.status : 500;
+    const errText = e?.message ? String(e.message) : String(e);
+    console.error("[anthropic-generate] list_files error", { requestId, status, error: errText });
+    return new Response(
+      JSON.stringify({ error: "Failed to list files", details: errText, requestId }),
+      { status, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
+  }
+}
 
     // Normalize inputs
     const model = body.model || "claude-3-5-sonnet-20240620"; // stable default
@@ -97,13 +136,21 @@ serve(async (req: Request) => {
 
     for (const candidate of candidates) {
       usedModel = candidate;
-      const payload = {
-        model: candidate,
-        system,
-        messages,
-        max_tokens,
-        temperature,
-      } as const;
+const attachments = Array.isArray(body.file_ids) && body.file_ids.length > 0
+  ? body.file_ids.map((id) => ({ file_id: id, ...(body.use_file_search !== false ? { tools: [{ type: "file_search" }] } : {}) }))
+  : undefined;
+
+const tools = body.use_file_search ? [{ type: "file_search" }] : undefined;
+
+const payload = {
+  model: candidate,
+  system,
+  messages,
+  max_tokens,
+  temperature,
+  ...(attachments ? { attachments } : {}),
+  ...(tools ? { tools } : {}),
+} as const;
 
       for (let attempt = 1; attempt <= 2; attempt++) {
         try {
@@ -139,20 +186,21 @@ serve(async (req: Request) => {
     }
 
 
-    // Extract plain text convenience field
+// Extract plain text convenience field
     const text = Array.isArray(data?.content)
       ? data.content
           .filter((c: any) => c?.type === "text")
           .map((c: any) => c?.text ?? "")
           .join("\n")
-      : "";
+      : (typeof data?.content?.[0]?.text === "string" ? data.content[0].text : "");
 
-    const result = {
+const result = {
       model: data?.model ?? model,
       usage: data?.usage ?? null,
       stop_reason: data?.stop_reason ?? null,
       content: data?.content ?? null,
       text,
+      used_files: Array.isArray(body.file_ids) ? body.file_ids : [],
       requestId,
     };
 

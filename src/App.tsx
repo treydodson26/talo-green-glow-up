@@ -11,6 +11,8 @@ import { ClassSchedulePage } from "./components/schedule/ClassSchedulePage";
 import { MyBookingsPage } from "./components/schedule/MyBookingsPage";
 import AIPlayground from "./pages/AIPlayground";
 import BIDashboard from "./pages/BIDashboard";
+import StudentsPage from "./pages/students";
+import StudentDetailPage from "./pages/StudentDetail";
 
 const queryClient = new QueryClient();
 
@@ -28,6 +30,8 @@ const App = () => (
           <Route path="/my-bookings" element={<MyBookingsPage />} />
           <Route path="/ai" element={<AIPlayground />} />
           <Route path="/bi" element={<BIDashboard />} />
+          <Route path="/students" element={<StudentsPage />} />
+          <Route path="/student/:id" element={<StudentDetailPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

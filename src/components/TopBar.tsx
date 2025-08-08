@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { Search, Plus, Bell, User, Sparkles, BarChart3 } from "lucide-react";
+import { Search, Plus, Bell, User, Sparkles, BarChart3, Users } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const TopBar = () => {
@@ -34,6 +34,12 @@ const TopBar = () => {
           <Link to="/bi" aria-label="Open BI Insights" className="flex items-center gap-1">
             <BarChart3 className="h-4 w-4" />
             <span className="hidden sm:inline">Insights</span>
+          </Link>
+        </Button>
+        <Button asChild variant="outline" size="sm">
+          <Link to="/students" aria-label="Open Students Gallery" className="flex items-center gap-1">
+            <Users className="h-4 w-4" />
+            <span className="hidden sm:inline">Students</span>
           </Link>
         </Button>
         <Button variant="ghost" size="icon">

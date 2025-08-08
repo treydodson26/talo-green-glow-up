@@ -1,8 +1,16 @@
+import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Mail, MessageSquare, Bot } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import MessageModal from "@/components/MessageModal";
+import { StudentAIChatDrawer } from "@/components/students/StudentAIChatDrawer";
 import type { Student } from "@/data/student-types";
 import { cn } from "@/lib/utils";
 

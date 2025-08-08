@@ -12,7 +12,7 @@ function clamp(n: number, min: number, max: number) {
 }
 
 function toMembershipStatus(row: any, introDay?: number): MembershipStatus {
-  const status = (row?.customer_status || "").toLowerCase();
+  const status = (row?.status || "").toLowerCase();
   if (status === "active") return "Member";
   if (typeof introDay === "number" && introDay >= 0 && introDay <= 30) return "Intro";
   const lastSeen = row?.last_seen ? new Date(row.last_seen) : null;
@@ -74,26 +74,24 @@ export function useStudents() {
     queryKey: ["students"],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("emily_customers")
+        .from("customers")
         .select(
           [
             "id",
+            "client_name",
             "first_name",
             "last_name",
-            "email",
-            "phone",
-            "avatar_url",
-            "customer_status",
+            "client_email",
+            "phone_number",
+            "status",
             "first_seen",
-            "customer_since",
             "last_seen",
-            "marketing_consent",
             "tags",
           ].join(",")
         );
 
       if (error) {
-        console.error("useStudents: failed to fetch emily_customers", { code: error.code, message: error.message, details: error.details });
+        console.error("useStudents: failed to fetch customers", { code: error.code, message: error.message, details: error.details });
         throw new Error(`Failed to load students: ${error.message}`);
       }
 
@@ -105,8 +103,11 @@ export function useStudents() {
       }
 
       const students: Student[] = rows.map((row: any) => {
-        const fullName = `${row?.first_name ?? ""} ${row?.last_name ?? ""}`.trim();
-        const startStr = row?.first_seen || row?.customer_since || null;
+        const baseName = (row?.client_name && String(row.client_name).trim().length > 0)
+          ? String(row.client_name).trim()
+          : `${row?.first_name ?? ""} ${row?.last_name ?? ""}`.trim();
+        const fullName = baseName || "Unknown";
+        const startStr = row?.first_seen || null;
         const start = startStr ? new Date(startStr) : null;
         const introDay = start ? clamp(diffInDays(new Date(), start), 0, 30) : undefined;
         const membershipStatus = toMembershipStatus(row, introDay);
@@ -119,9 +120,9 @@ export function useStudents() {
         return {
           id: String(row.id),
           fullName,
-          email: row?.email ?? null,
-          phone: row?.phone ?? null,
-          avatarUrl: row?.avatar_url ?? null,
+          email: row?.client_email ?? null,
+          phone: row?.phone_number ?? null,
+          avatarUrl: null,
           membershipStatus,
           introOfferStart: startStr,
           introDay,

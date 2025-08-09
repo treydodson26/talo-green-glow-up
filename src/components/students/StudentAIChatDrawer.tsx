@@ -57,6 +57,9 @@ Student context:\n- Name: ${student.fullName}\n- Status: ${student.membershipSta
           messages: [...messages, userMsg],
           temperature: 0.2,
           max_tokens: 512,
+          use_db: true,
+          student_id: Number.isFinite(Number(student.id)) ? Number(student.id) : undefined,
+          student_email: student.email || undefined,
         },
       });
 

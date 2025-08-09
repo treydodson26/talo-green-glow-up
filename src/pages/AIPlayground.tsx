@@ -14,6 +14,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Copy, ArrowRight } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
 
 const models = [
   { id: "claude-sonnet-4-20250514", label: "Claude 4 Sonnet (2025-05 latest)" },
@@ -31,6 +32,7 @@ export default function AIPlayground() {
   const [maxTokens, setMaxTokens] = useState(512);
   const [loading, setLoading] = useState(false);
   const [output, setOutput] = useState("");
+  const [useDb, setUseDb] = useState(true);
 
   // Basic SEO for this page
   useEffect(() => {
@@ -57,10 +59,12 @@ export default function AIPlayground() {
       const { data, error } = await supabase.functions.invoke("anthropic-generate", {
         body: {
           prompt: prompt.trim(),
+          question: prompt.trim(),
           model,
           temperature,
           max_tokens: maxTokens,
           system,
+          use_db: useDb,
         },
       });
 
@@ -155,6 +159,11 @@ export default function AIPlayground() {
                   />
                 </div>
               </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <Switch id="useDb" checked={useDb} onCheckedChange={setUseDb} />
+              <Label htmlFor="useDb">Use customers database context</Label>
             </div>
 
             <div>

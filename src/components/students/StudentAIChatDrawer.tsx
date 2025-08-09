@@ -16,6 +16,40 @@ interface StudentAIChatDrawerProps {
 
 type ChatMessage = { role: "system" | "user" | "assistant"; content: string };
 
+function stripMarkdown(input: string): string {
+  try {
+    return input
+      // Remove code fences and keep nothing inside blocks
+      .replace(/```[\s\S]*?```/g, "")
+      // Inline code: keep content, drop backticks
+      .replace(/`([^`]*)`/g, "$1")
+      // Headings
+      .replace(/^#{1,6}\s+/gm, "")
+      // Blockquotes
+      .replace(/^>\s?/gm, "")
+      // Bold/italics
+      .replace(/(\*\*|__)(.*?)\1/g, "$2")
+      .replace(/(\*|_)(.*?)\1/g, "$2")
+      // Images ![alt](url) -> alt
+      .replace(/!\[([^\]]*)\]\([^\)]*\)/g, "$1")
+      // Links [text](url) -> text
+      .replace(/\[([^\]]*)\]\([^\)]*\)/g, "$1")
+      // Lists bullets
+      .replace(/^\s*[-*+]\s+/gm, "")
+      .replace(/^\s*\d+\.\s+/gm, (m) => m.replace(/\d+\.\s+/, ""))
+      // Tables and HRs
+      .replace(/^\|.*\|$/gm, (m) => m.replace(/\|/g, " ").trim())
+      .replace(/^(-{3,}|\*{3,}|_{3,})$/gm, "")
+      // Extra asterisks/underscores
+      .replace(/[*_]{2,}/g, "")
+      // Collapse multiple blank lines
+      .replace(/\n{3,}/g, "\n\n")
+      .trim();
+  } catch {
+    return input;
+  }
+}
+
 export function StudentAIChatDrawer({ open, onOpenChange, student }: StudentAIChatDrawerProps) {
   const { toast } = useToast();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -74,7 +108,8 @@ Student context:\n- Name: ${student.fullName}\n- Status: ${student.membershipSta
       }
 
       const text: string = (data as any)?.text || "";
-      setMessages((m) => [...m, { role: "assistant", content: text || "(no response)" }]);
+      const cleaned = stripMarkdown(text);
+      setMessages((m) => [...m, { role: "assistant", content: cleaned || "(no response)" }]);
     } catch (e: any) {
       console.error("StudentAIChatDrawer send failed", { message: e?.message, stack: e?.stack });
       toast({ title: "AI request failed", description: String(e?.message || e), variant: "destructive" as any });

@@ -39,7 +39,7 @@
     --ring: 150 25% 65%;                /* Focus ring - primary */
     
     /* Assistant Panel (high-contrast) */
-    --assistant-bg: 0 0% 0%;            /* Solid black */
+    --assistant-bg: 0 0% 12%;           /* Dark gray (#1E1E1E) */
     --assistant-text: 0 0% 100%;        /* Pure white */
     --assistant-text-muted: 0 0% 80%;   /* Soft white for secondary text */
     

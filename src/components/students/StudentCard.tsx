@@ -86,11 +86,11 @@ export function StudentCard({ student }: { student: Student }) {
       )}
       aria-label={`Open ${student.fullName} details`}
     >
-      <CardContent className="p-5">
+      <CardContent className="p-4">
         {/* Header */}
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-3">
-            <Avatar className={cn("h-14 w-14 ring-2 shadow-sm", avatarRing)}>
+            <Avatar className={cn("h-12 w-12 ring-2 shadow-sm", avatarRing)}>
               <AvatarImage src={student.avatarUrl || "/placeholder.svg"} alt={`${student.fullName} avatar`} loading="lazy" />
               <AvatarFallback>
                 <UsersIcon className="h-6 w-6 text-muted-foreground" aria-hidden="true" />
@@ -116,13 +116,15 @@ export function StudentCard({ student }: { student: Student }) {
               </div>
             </div>
           </div>
-          <Badge variant={statusBadgeVariant(student.membershipStatus)}>
+          <Badge variant={statusBadgeVariant(student.membershipStatus)} className={cn(
+            student.membershipStatus === "Inactive" && "bg-muted text-foreground/70"
+          )}>
             {student.membershipStatus}
           </Badge>
         </div>
 
         {/* Body */}
-        <div className="mt-4 space-y-3">
+        <div className="mt-3 space-y-2">
           {showIntro && (
             <div>
               <div className="flex items-center justify-between text-sm">
@@ -145,7 +147,7 @@ export function StudentCard({ student }: { student: Student }) {
 
         {/* Footer tags */}
         {student.tags?.length ? (
-          <div className="mt-4 flex flex-wrap gap-2">
+          <div className="mt-3 flex flex-wrap gap-2">
             {student.tags.slice(0, 4).map((t) => (
               <Badge key={t} variant="outline" className="text-xs">
                 {t}
@@ -158,7 +160,7 @@ export function StudentCard({ student }: { student: Student }) {
         ) : null}
 
         {/* Actions */}
-        <div className="mt-4 flex items-center gap-2">
+        <div className="mt-3 flex items-center gap-2">
           <Button
             variant="outline"
             size="sm"

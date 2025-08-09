@@ -161,7 +161,7 @@ export default function StudentDetailPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* AI Assistant */}
         <div className="lg:col-span-2">
-          <Card className="bg-[hsl(var(--assistant-bg))] text-[hsl(var(--assistant-text))] border border-white/10">
+          <Card className="bg-[hsl(var(--assistant-bg))] text-[hsl(var(--assistant-text))] border border-white/10 rounded-2xl shadow-intimate">
             <CardHeader className="flex flex-row items-center justify-between border-b border-white/10">
               <div className="flex items-center gap-2">
                 <Sparkles className="h-5 w-5 text-[hsl(var(--assistant-text))]" />
@@ -231,19 +231,19 @@ export default function StudentDetailPage() {
             <CardContent>
               <div className="grid grid-cols-2 gap-3">
                 <div className="rounded-lg border bg-muted/30 p-3">
-                  <div className="text-xs text-muted-foreground">Email</div>
+                  <div className="text-xs text-foreground/80">Email</div>
                   <div className="text-sm font-medium truncate">{student.email || "—"}</div>
                 </div>
                 <div className="rounded-lg border bg-muted/30 p-3">
-                  <div className="text-xs text-muted-foreground">Phone</div>
+                  <div className="text-xs text-foreground/80">Phone</div>
                   <div className="text-sm font-medium truncate">{student.phone || "—"}</div>
                 </div>
                 <div className="rounded-lg border bg-muted/30 p-3">
-                  <div className="text-xs text-muted-foreground">Intro Day</div>
+                  <div className="text-xs text-foreground/80">Intro Day</div>
                   <div className="text-sm font-medium">{typeof student.introDay === "number" ? `${student.introDay}/30` : "—"}</div>
                 </div>
                 <div className="rounded-lg border bg-muted/30 p-3">
-                  <div className="text-xs text-muted-foreground">Classes (7d)</div>
+                  <div className="text-xs text-foreground/80">Classes (7d)</div>
                   <div className="text-sm font-medium">{student.classes7d ?? 0}</div>
                 </div>
               </div>

@@ -6,7 +6,7 @@ import { Progress } from "@/components/ui/progress";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Mail, MessageSquare, Bot, User as UserIcon } from "lucide-react";
+import { Mail, MessageSquare, Bot, Users as UsersIcon } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import MessageModal from "@/components/MessageModal";
@@ -76,7 +76,7 @@ export function StudentCard({ student }: { student: Student }) {
             <Avatar className="h-14 w-14 ring-1 ring-border shadow-sm">
               <AvatarImage src={student.avatarUrl || "/placeholder.svg"} alt={`${student.fullName} avatar`} loading="lazy" />
               <AvatarFallback>
-                <UserIcon className="h-6 w-6 text-muted-foreground" aria-hidden="true" />
+                <UsersIcon className="h-6 w-6 text-muted-foreground" aria-hidden="true" />
               </AvatarFallback>
             </Avatar>
             <div>

@@ -36,7 +36,7 @@ const topNavItems = [
 ];
 
 const bottomNavItems = [
-  { id: "customers", icon: UserPlus, label: "Students" },
+  { id: "customers", icon: Users, label: "Students" },
   { id: "marketing-hub", icon: Megaphone, label: "Marketing Hub" },
   { id: "operations-hub", icon: Cog, label: "Operations Hub" },
   { id: "instructor-hub", icon: GraduationCap, label: "Instructor Hub" },

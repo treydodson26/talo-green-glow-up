@@ -38,6 +38,11 @@
     --input: 35 20% 92%;                /* Input background */
     --ring: 150 25% 65%;                /* Focus ring - primary */
     
+    /* Assistant Panel (high-contrast) */
+    --assistant-bg: 0 0% 0%;            /* Solid black */
+    --assistant-text: 0 0% 100%;        /* Pure white */
+    --assistant-text-muted: 0 0% 80%;   /* Soft white for secondary text */
+    
     /* Brand-specific gradients and effects */
     --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
     --gradient-warm: linear-gradient(180deg, hsl(var(--background)), hsl(var(--muted)));

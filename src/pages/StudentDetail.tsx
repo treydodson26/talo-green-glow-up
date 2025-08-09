@@ -161,25 +161,37 @@ export default function StudentDetailPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* AI Assistant */}
         <div className="lg:col-span-2">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
+          <Card className="bg-[hsl(var(--assistant-bg))] text-[hsl(var(--assistant-text))] border border-white/10">
+            <CardHeader className="flex flex-row items-center justify-between border-b border-white/10">
               <div className="flex items-center gap-2">
-                <Sparkles className="h-5 w-5" />
-                <CardTitle>{student.fullName}'s AI Assistant</CardTitle>
+                <Sparkles className="h-5 w-5 text-[hsl(var(--assistant-text))]" />
+                <CardTitle className="text-[hsl(var(--assistant-text))]">{student.fullName}'s AI Assistant</CardTitle>
               </div>
-              <Button variant="secondary" size="sm" onClick={() => setInput(`Give me a short, friendly outreach idea for ${student.fullName}.`)}>Load Demo</Button>
+              <Button
+                variant="default"
+                size="lg"
+                className="h-11 px-5 font-semibold"
+                onClick={() => setInput(`Give me a short, friendly outreach idea for ${student.fullName}.`)}
+              >
+                Load Demo
+              </Button>
             </CardHeader>
             <CardContent>
-              <div className="border rounded-xl">
+              <div className="rounded-xl border border-white/10 bg-white/5">
                 <ScrollArea className="h-[360px] p-4">
                   <div className="space-y-3">
                     {messages.map((m, i) => (
-                      <div key={i} className={m.role === "user" ? "ml-auto max-w-[80%] rounded-lg bg-primary/10 px-3 py-2 text-sm" : "mr-auto max-w-[80%] rounded-lg bg-muted px-3 py-2 text-sm"}>
+                      <div
+                        key={i}
+                        className={m.role === "user"
+                          ? "ml-auto max-w-[80%] rounded-lg bg-primary/30 text-white px-3 py-2 text-sm"
+                          : "mr-auto max-w-[80%] rounded-lg bg-white/10 text-white px-3 py-2 text-sm"}
+                      >
                         {m.content}
                       </div>
                     ))}
                     {loading && (
-                      <div className="mr-auto max-w-[80%] rounded-lg bg-muted px-3 py-2 text-sm flex items-center gap-2">
+                      <div className="mr-auto max-w-[80%] rounded-lg bg-white/10 text-white px-3 py-2 text-sm flex items-center gap-2">
                         <Loader2 className="h-4 w-4 animate-spin" />
                         Thinking…
                       </div>
@@ -187,14 +199,23 @@ export default function StudentDetailPage() {
                     <div ref={bottomRef} />
                   </div>
                 </ScrollArea>
-                <div className="border-t p-3 flex items-end gap-2">
+                <div className="border-t border-white/10 p-3 flex items-end gap-2">
                   <Textarea
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     placeholder={`Ask about ${student.fullName}'s status, recent activity, or next best action…`}
                     rows={2}
+                    className="bg-white/5 text-white placeholder:text-white/60 border-white/10 focus-visible:ring-primary/60 min-h-[44px]"
                   />
-                  <Button onClick={handleSend} disabled={!canSend} aria-label="Send">{loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}</Button>
+                  <Button
+                    onClick={handleSend}
+                    disabled={!canSend}
+                    aria-label="Send"
+                    size="lg"
+                    className="h-11 w-11 p-0 rounded-full"
+                  >
+                    {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
+                  </Button>
                 </div>
               </div>
             </CardContent>

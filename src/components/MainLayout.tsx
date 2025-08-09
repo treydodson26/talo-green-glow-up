@@ -2,7 +2,7 @@ import { useState } from "react";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import TopBar from "@/components/TopBar";
-import ClientsTable from "@/components/ClientsTable";
+import StudentsPage from "@/pages/students";
 import HomePage from "@/components/HomePage";
 import InboxPage from "@/components/InboxPage";
 import InstructorHub from "@/components/InstructorHub";
@@ -29,7 +29,7 @@ const MainLayout = () => {
       case "inbox":
         return <InboxPage />;
       case "customers":
-        return <ClientsTable />;
+        return <StudentsPage />;
       case "schedule":
         return <ClassSchedulePage />;
       case "my-bookings":
@@ -48,7 +48,7 @@ const MainLayout = () => {
           </div>
         );
       default:
-        return <ClientsTable />;
+        return <StudentsPage />;
     }
   };
 

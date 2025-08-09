@@ -25,7 +25,7 @@ const Sidebar = ({ activeRoute = "home", onRouteChange }: SidebarProps) => {
   ];
 
   const bottomNavItems = [
-    { id: "customers", icon: UserPlus, label: "Customer Hub" },
+    { id: "customers", icon: UserPlus, label: "Students" },
     { id: "marketing-hub", icon: Megaphone, label: "Marketing Hub" },
     { id: "operations-hub", icon: Cog, label: "Operations Hub" },
     { id: "segments", icon: BarChart3, label: "Segments" },

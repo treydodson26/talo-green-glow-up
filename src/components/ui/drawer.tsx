@@ -37,7 +37,9 @@ const DrawerContent = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof DrawerPrimitive.Content>
 >(({ className, children, ...props }, ref) => (
   <DrawerPortal>
-    <DrawerOverlay />
+    <DrawerClose asChild>
+      <DrawerOverlay />
+    </DrawerClose>
     <DrawerPrimitive.Content
       ref={ref}
       className={cn(

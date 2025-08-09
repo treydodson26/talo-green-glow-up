@@ -88,7 +88,7 @@ export function StudentsFilter(props: StudentsFilterProps) {
               <ChevronDown className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="z-50 bg-popover">
+          <DropdownMenuContent className="z-50 bg-popover text-popover-foreground border shadow-md">
             <DropdownMenuLabel>Membership Status</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <div className="px-2 py-1">
@@ -120,7 +120,7 @@ export function StudentsFilter(props: StudentsFilterProps) {
               <ChevronDown className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="z-50 bg-popover">
+          <DropdownMenuContent className="z-50 bg-popover text-popover-foreground border shadow-md">
             <DropdownMenuLabel>Intro Day Ranges</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <div className="px-2 py-1">
@@ -153,7 +153,7 @@ export function StudentsFilter(props: StudentsFilterProps) {
                 <ChevronDown className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="z-50 bg-popover max-h-64 overflow-auto">
+            <DropdownMenuContent className="z-50 bg-popover text-popover-foreground border shadow-md max-h-64 overflow-auto">
               <DropdownMenuLabel>Tags</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <div className="px-2 py-1">

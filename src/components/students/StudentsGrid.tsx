@@ -56,17 +56,19 @@ export function StudentsGrid({ students }: StudentsGridProps) {
 
   return (
     <section className="space-y-6">
-      <StudentsFilter
-        search={search}
-        setSearch={setSearch}
-        selectedStatuses={selectedStatuses}
-        setSelectedStatuses={setSelectedStatuses}
-        selectedIntroRanges={selectedIntroRanges}
-        setSelectedIntroRanges={setSelectedIntroRanges}
-        selectedTags={selectedTags}
-        setSelectedTags={setSelectedTags}
-        availableTags={availableTags}
-      />
+      <div className="sticky top-0 z-40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b py-3 -mx-4 px-4 sm:mx-0 sm:px-0">
+        <StudentsFilter
+          search={search}
+          setSearch={setSearch}
+          selectedStatuses={selectedStatuses}
+          setSelectedStatuses={setSelectedStatuses}
+          selectedIntroRanges={selectedIntroRanges}
+          setSelectedIntroRanges={setSelectedIntroRanges}
+          selectedTags={selectedTags}
+          setSelectedTags={setSelectedTags}
+          availableTags={availableTags}
+        />
+      </div>
 
       {filtered.length === 0 ? (
         <div className="text-center text-muted-foreground py-20">

@@ -52,10 +52,26 @@ function statusBadgeVariant(status: Student["membershipStatus"]) {
 
 export function StudentCard({ student }: { student: Student }) {
   const [aiOpen, setAiOpen] = useState(false);
+  const [msgOpen, setMsgOpen] = useState(false);
+  const [msgType, setMsgType] = useState<'email' | 'text'>('email');
+  const { toast } = useToast();
   const onOpen = () => setAiOpen(true);
 
   const showIntro = student.membershipStatus === "Intro" && typeof student.introDay === "number";
   const progress = showIntro ? Math.round(((student.introDay ?? 0) / 30) * 100) : 0;
+  const avatarRing = useMemo(() => {
+    switch (student.membershipStatus) {
+      case "Member":
+        return "ring-primary/40";
+      case "Churn Risk":
+        return "ring-destructive/40";
+      case "Intro":
+        return "ring-ring/40";
+      case "Inactive":
+      default:
+        return "ring-border";
+    }
+  }, [student.membershipStatus]);
 
   return (
     <Card
@@ -73,7 +89,7 @@ export function StudentCard({ student }: { student: Student }) {
         {/* Header */}
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-3">
-            <Avatar className="h-14 w-14 ring-1 ring-border shadow-sm">
+            <Avatar className={cn("h-14 w-14 ring-2 shadow-sm", avatarRing)}>
               <AvatarImage src={student.avatarUrl || "/placeholder.svg"} alt={`${student.fullName} avatar`} loading="lazy" />
               <AvatarFallback>
                 <UsersIcon className="h-6 w-6 text-muted-foreground" aria-hidden="true" />
@@ -132,7 +148,51 @@ export function StudentCard({ student }: { student: Student }) {
             )}
           </div>
         ) : null}
+
+        {/* Actions */}
+        <div className="mt-4 flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={(e) => {
+              e.stopPropagation();
+              setMsgType('email');
+              setMsgOpen(true);
+            }}
+          >
+            <Mail className="h-4 w-4 mr-2" /> Message
+          </Button>
+          <Button
+            variant="default"
+            size="sm"
+            onClick={(e) => {
+              e.stopPropagation();
+              setAiOpen(true);
+            }}
+          >
+            <Bot className="h-4 w-4 mr-2" /> Ask AI
+          </Button>
+        </div>
       </CardContent>
+
+      {/* Modals */}
+      <MessageModal
+        isOpen={msgOpen}
+        onClose={() => setMsgOpen(false)}
+        messageType={msgType}
+        customer={{
+          id: Number(student.id) || 0,
+          first_name: student.fullName.split(" ")[0] || "",
+          last_name: student.fullName.split(" ").slice(1).join(" ") || "",
+          client_email: student.email || "",
+          phone_number: student.phone || "",
+        }}
+        onSend={async () => {
+          // TODO: wire to edge functions send-gmail-message/send-whatsapp-message
+          // For now, just toast success
+          toast({ title: "Message queued", description: `To ${student.fullName}` });
+        }}
+      />
       <StudentAIChatDrawer open={aiOpen} onOpenChange={setAiOpen} student={student} />
     </Card>
   );

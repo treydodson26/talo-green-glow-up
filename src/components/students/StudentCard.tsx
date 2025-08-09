@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -51,11 +51,12 @@ function statusBadgeVariant(status: Student["membershipStatus"]) {
 }
 
 export function StudentCard({ student }: { student: Student }) {
+  const navigate = useNavigate();
   const [aiOpen, setAiOpen] = useState(false);
   const [msgOpen, setMsgOpen] = useState(false);
   const [msgType, setMsgType] = useState<'email' | 'text'>('email');
   const { toast } = useToast();
-  const onOpen = () => setAiOpen(true);
+  const onOpen = () => navigate(`/student/${student.id}`);
 
   const showIntro = student.membershipStatus === "Intro" && typeof student.introDay === "number";
   const progress = showIntro ? Math.round(((student.introDay ?? 0) / 30) * 100) : 0;

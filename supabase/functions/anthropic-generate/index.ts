@@ -91,7 +91,7 @@ if (body.action === "list_files") {
 }
 
     // Normalize inputs
-    const model = body.model || "claude-3-5-sonnet-20240620"; // stable default
+    const model = body.model || "claude-sonnet-4-20250514"; // latest default
     const max_tokens = body.max_tokens ?? 1024;
     const temperature = body.temperature ?? 0.7;
 
@@ -125,8 +125,9 @@ if (body.action === "list_files") {
     // Build candidate models: selected first, then fallbacks
     const candidates = Array.from(new Set([
       model,
-      "claude-3-5-sonnet-20240620",
-      "claude-3-haiku-20240307",
+      "claude-sonnet-4-20250514",
+      "claude-opus-4-20250514",
+      "claude-3-5-haiku-20241022",
     ]));
 
     let data: any | undefined;

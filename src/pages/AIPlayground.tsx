@@ -16,10 +16,10 @@ import {
 import { Copy, ArrowRight } from "lucide-react";
 
 const models = [
-  { id: "claude-3-5-sonnet-20240620", label: "Claude 3.5 Sonnet (2024-06)" },
+  { id: "claude-sonnet-4-20250514", label: "Claude 4 Sonnet (2025-05 latest)" },
+  { id: "claude-opus-4-20250514", label: "Claude 4 Opus (2025-05 advanced)" },
   { id: "claude-3-5-haiku-20241022", label: "Claude 3.5 Haiku (2024-10 fast)" },
-  { id: "claude-3-opus-20240229", label: "Claude 3 Opus (2024-02)" },
-  { id: "claude-3-haiku-20240307", label: "Claude 3 Haiku (2024-03 fast)" },
+  { id: "claude-3-5-sonnet-20240620", label: "Claude 3.5 Sonnet (2024-06)" },
 ];
 
 export default function AIPlayground() {

@@ -6,7 +6,7 @@ import { Progress } from "@/components/ui/progress";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Mail, MessageSquare, Bot, Users as UsersIcon } from "lucide-react";
+import { Mail, MessageSquare, Bot, Users as UsersIcon, Phone } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import MessageModal from "@/components/MessageModal";
@@ -96,16 +96,23 @@ export function StudentCard({ student }: { student: Student }) {
                 <UsersIcon className="h-6 w-6 text-muted-foreground" aria-hidden="true" />
               </AvatarFallback>
             </Avatar>
-            <div>
+            <div className="min-w-0">
               <div className="text-base font-semibold leading-tight">{student.fullName}</div>
-              <div className="text-sm text-muted-foreground truncate max-w-[220px]">
-                {student.email || ""}
-                {student.phone && (
-                  <span>
-                    {student.email ? " • " : null}
+              <div className="mt-0.5 space-y-1">
+                <div className="text-sm text-muted-foreground truncate" title={student.email || ""}>
+                  {student.email || ""}
+                </div>
+                {student.phone ? (
+                  <a
+                    href={`tel:${student.phone}`}
+                    onClick={(e) => e.stopPropagation()}
+                    className="inline-flex items-center gap-1.5 text-sm text-foreground hover:underline focus:underline break-words"
+                    aria-label={`Call ${student.fullName}`}
+                  >
+                    <Phone className="h-3.5 w-3.5" aria-hidden="true" />
                     {formatPhone(student.phone)}
-                  </span>
-                )}
+                  </a>
+                ) : null}
               </div>
             </div>
           </div>
